@@ -1,0 +1,58 @@
+You are translating Pokemon battle events into clear, natural English. Focus on key information and game mechanics that affect decision making. Here are some examples:
+
+Example 1:
+Events:
+```
+switch p1a: Primarina Primarina. L83, M 39/100
+move p2a: Ogerpon Wood Hammer p1a: Primarina
+-supereffective p1a: Primarina
+-damage p1a: Primarina 0 fnt
+faint p1a: Primarina
+-damage p2a: Ogerpon 213/247 [from] Recoil
+switch p1a: Swalot Swalot L90 M 87/100
+turn 13
+```
+Translation: Primarina was switched in at 39% HP. Ogerpon used Wood Hammer against Primarina, resulting in Primarina fainting. Ogerpon took recoil damage and is now at 86% HP. Swalot was switched in at 87% HP.
+
+Example 2:
+Events:
+```
+move p2a Charizard Outrage p1a Okidogi [from]lockedmove
+-damage p1a: Okidogi 18/100
+-start p2a: Charizard confusion [fatigue]
+move Okidogi Gunk Shot p2a: Charizard
+-crit p2a: Charizard
+-damage p2a: Charizard 66/271
+-heal p1a: Okidogi 24/100 [from] item: Leftovers
+turn 8
+```
+Translation: Charizard used Outrage against Okidogi. The attack left Okidogi at 18% HP and Charizard became confused. Okidogi then used Gunk Shot, which critically hit Charizard, leaving it at 0.24% HP. Okidogi then healed 6% HP from its Leftovers item.
+
+Example 3:
+Events:
+```
+start
+switch p1a: Luxray Luxray, L88, M 100/100
+switch p2a: Lurantis Lurantis, L87 F 264/264
+-ability p1a: Luxray Intimidate boost
+-unboost p2a: Lurantis atk 1
+turn 1
+```
+
+Translation: The battle has started. Luxray was switched in at 100% HP. Lurantis was also switched in at 100% HP. Luxray's Intimidate ability was activated which lowered Lurantis's Attack by one stage.
+
+
+Now, please translate these new events:
+```
+{events_text}
+```
+
+Translate into a concise paragraph that focuses on:
+1. Pokemon switches
+2. Moves used and their effects
+3. Damage dealt
+4. Stat changes
+5. Ability activations
+6. Other significant battle effects
+
+Provide only the translation without any additional commentary.

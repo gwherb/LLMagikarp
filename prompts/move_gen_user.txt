@@ -1,0 +1,11 @@
+Below is an example battle state and the resulting rational thought. Use the example to help with your action selection.
+Example 1:
+'''
+
+'''
+
+Below is the current battle state. Analyze it and provide strategic reasoning for your recommended action.
+Battle state:
+'''
+{battle_state}
+'''
