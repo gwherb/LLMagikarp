@@ -1,18 +1,18 @@
 import asyncio
 from poke_env import AccountConfiguration, ShowdownServerConfiguration
-from poke_env.player import RandomPlayer
-from players import TestPlayer
+from poke_env.player import RandomPlayer, SimpleHeuristicsPlayer
+from players import *
 
 async def local():
 
     # Create Player 1
-    random_player_1 = RandomPlayer()
+    LLMagikarp = LoggingPlayer()
 
     # Create Player 2
-    random_player_2 = TestPlayer()
+    HeuristicsPlayer = SimpleHeuristicsPlayer()
 
     # Start the battle
-    await random_player_1.battle_against(random_player_2, n_battles=1)
+    await LLMagikarp.battle_against(HeuristicsPlayer, n_battles=1)
 
 async def server():
 

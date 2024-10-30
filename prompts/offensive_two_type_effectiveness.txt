@@ -1,0 +1,2 @@
+{Species} has stronger {Type1} type attacks as a result of it's same type attack bonus (1.5x). This attack type is supereffective (2x) against {supereffective1}, resisted (0.5x) by {resisted1}, and immune (0x) to {immune1}. 
+{Species} also has stronger {Type2} moves. This attack type is supereffective (2x) against {supereffective2}, resisted (0.5x) by {resisted2}, and immune (0x) to {immune2}. Keep in mind that while this is the main attack type of the opposing Pokemon, it can use other typed moves as well.

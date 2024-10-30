@@ -1,16 +1,15 @@
 from openai import OpenAI
-import os
 from dotenv import load_dotenv, find_dotenv
 from icecream import ic
 import json
-from pathlib import Path
+from .utils import load_prompt
 
 def move_prompt(battle_state):
     
     system_message = load_prompt("move_gen_system.txt")
     user_message = load_prompt("move_gen_user.txt")
 
-    user_message = user_message.format( battle_state=battle_state)
+    user_message = user_message.format(battle_state=battle_state)
 
     prompt = {
         "system": system_message,
@@ -50,7 +49,8 @@ def move_prompt(battle_state):
             {"role": "user", "content": prompt["human"]}
         ],
         functions=[prompt["function_schema"]],
-        function_call={"name": "select_move"}
+        function_call={"name": "select_move"},
+        temperature=1
     )
 
 
@@ -58,17 +58,12 @@ def move_prompt(battle_state):
     function_args = json.loads(response.choices[0].message.function_call.arguments)
     
     # Return the three specific fields
+    # ic(function_args)
     return (
         function_args["Thought"],
         function_args["action_type"],
         function_args["action_name"]
     )
-
-def load_prompt(filename):
-    prompt_path = Path("prompts") / filename
-    with open(prompt_path, "r", encoding="utf-8") as f:
-        return f.read().strip()
-
 
 def test_move_prompt():
     battle_state = '''Turn 1 (Last turn):'

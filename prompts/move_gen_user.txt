@@ -1,10 +1,89 @@
 Below is an example battle state and the resulting rational thought. Use the example to help with your action selection.
 Example 1:
 '''
+Turn 11 (Last turn):
+Espeon was switched in at 100% HP. Pyroar used Hyper Voice against Espeon, 
+dealing damage and leaving it with 55% HP. There were no weather effects 
+impacting the battle.
 
+Turn 12 (Current turn):
+
+Opponent has 5 Pokemon left.
+
+Opponent's active Pokemon: pyroar (51% HP), Status: None, Ability: unnerve, 
+Type 1: FIRE Type 2: NORMAL
+
+pyroar is very weak (4x) to these attack types , weak (2x) to these attack 
+types WATER, FIGHTING, GROUND, ROCK, resistant (0.5x) to these attack types 
+FIRE, GRASS, ICE, BUG, STEEL, FAIRY, very resistant (0.25x) to these attack 
+types NONE, and immune (0x) to these attack types GHOST.
+
+pyroar has stronger FIRE type attacks as a result of it's same type attack 
+bonus (1.5x). This attack type is supereffective (2x) against GRASS, ICE, 
+BUG, STEEL, resisted (0.5x) by FIRE, WATER, ROCK, DRAGON, and immune (0x) to NONE.
+
+pyroar also has stronger NORMAL moves. This attack type is supereffective 
+(2x) against NONE, resisted (0.5x) by ROCK, STEEL, and immune (0x) to GHOST. 
+Keep in mind that while this is the main attack type of the opposing 
+Pokemon, it can use other typed moves as well.
+
+Opponent's known available swtiches: abomasnow (100% HP)
+
+Your active Pokemon: espeon (56% HP), Status: None, Ability: magicbounce, 
+Type 1: PSYCHIC Type 2: None
+
+Your active Pokemon has the following moves:
+
+Move: alluringvoice, Base Power: 80, Type: FAIRY, Category: SPECIAL
+
+Move: shadowball, Base Power: 80, Type: GHOST, Category: SPECIAL
+
+Move: psychic, Base Power: 90, Type: PSYCHIC, Category: SPECIAL
+
+Move: trick, Base Power: 0, Type: PSYCHIC, Category: STATUS
+
+Your available Pokemon:
+
+Available Switch: pawmot (28% HP), Status: None, Ability: ironfist, Type 1: 
+ELECTRIC Type 2: FIGHTING
+
+Available Switch: flareon (59% HP), Status: TOX (status) object, Ability: 
+guts, Type 1: FIRE Type 2: None
+
+Available Switch: ogerpon (49% HP), Status: None, Ability: defiant, Type 1: 
+GRASS Type 2: None
+'''
+
+Response to Example1:
+'''
+Let me think through this situation step by step:
+
+1. Matchup Analysis:
+- Pyroar (Fire/Normal) is currently at 51% HP
+- My Espeon (Psychic) is at 56% HP and took significant damage from Hyper Voice
+- Espeon's moves are not super-effective against Pyroar
+- Ghost moves are actually immune against Normal-type
+
+2. Threat Assessment:
+- Pyroar has STAB Normal and Fire moves
+- Neither are super-effective against Espeon
+- But Hyper Voice has already shown to do significant damage (45%)
+
+3. Available Options:
+- Can stay in and use Psychic for neutral damage
+- Shadow Ball would be blocked by Normal-typing
+- Alluring Voice would be resisted
+- Could switch to Pawmot for Fighting coverage, but it's low HP
+- Ogerpon would be weak to Fire moves
+
+4. Strategic Priority:
+Given that Espeon is still above 50% HP and can deal neutral damage while not being weak to Pyroar's STAB moves, the best play is to stay in and use our strongest neutral move.
+
+{{"Thought": "Espeon is in a neutral matchup against Pyroar. While none of our moves are super-effective, Psychic offers the highest base power (90) for neutral damage. With Espeon still healthy at 56% and no immediate threats, staying in to deal damage is better than risking a switch that could give Pyroar a free turn.", "action_type": "move", "action_name": "psychic"}}
 '''
 
 Below is the current battle state. Analyze it and provide strategic reasoning for your recommended action.
+Remember, to consider that switching is important to create favorable matchups, but switching too much can create a scenario where you are consistently taking damage without dealing any in return.
 Battle state:
 '''
 {battle_state}

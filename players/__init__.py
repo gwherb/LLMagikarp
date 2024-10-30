@@ -1,4 +1,5 @@
 from .TestPlayer import TestPlayer
+from .LoggingPlayer import LoggingPlayer
 # Import other player classes here
 # from .AnotherPlayer import AnotherPlayer
 # from .YetAnotherPlayer import YetAnotherPlayer
@@ -8,4 +9,4 @@ from .TestPlayer import TestPlayer
 
 # If you want to control what gets imported when someone does `from players import *`,
 # you can define __all__:
-__all__ = ['TestPlayer']  # Add other player names to this list as needed
+__all__ = ['TestPlayer', 'LoggingPlayer']  # Add other player names to this list as needed

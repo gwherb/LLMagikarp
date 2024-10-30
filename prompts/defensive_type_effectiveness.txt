@@ -1,0 +1,1 @@
+{Species} is very weak (4x) to these attack types {m4x}, weak (2x) to these attack types {m2x}, resistant (0.5x) to these attack types {m0_5x}, very resistant (0.25x) to these attack types {m0_25x}, and immune (0x) to these attack types {m0x}.

@@ -22,9 +22,11 @@ class TestPlayer(Player):
 
         # use prompt to make decision:
         thought, move_type, action_name = move_prompt(battle_state)
+        ic(battle_state)
         ic(battle.turn)
         ic(move_type)
         ic(action_name)
+
 
         # Select move depending on the prompt
         if move_type == "move":
@@ -40,4 +42,5 @@ class TestPlayer(Player):
                     return self.create_order(switch)
 
         # Not sure what to do?
+        ic("Random move")
         return self.choose_random_move(battle)

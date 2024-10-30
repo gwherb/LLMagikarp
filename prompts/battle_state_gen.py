@@ -2,7 +2,8 @@ from openai import OpenAI
 import os
 from icecream import ic
 from dotenv import load_dotenv, find_dotenv
-from .move_prompt import load_prompt
+from .utils import load_prompt
+from .type_effectiveness import *
 
 def format_battle_prompt(battle):
     """
@@ -28,6 +29,7 @@ def format_battle_prompt(battle):
     
     # Current turn information
     prompt_parts.append(f"Turn {current_turn + 1} (Current turn):")
+
     
     # Opponent Pokemon information
     # Get the number of Pokemon the opponent has left
@@ -40,12 +42,54 @@ def format_battle_prompt(battle):
     # Get the opponent's active Pokemon
     opponent_active_pokemon = battle.opponent_active_pokemon
 
+    # Get defensive type info for the opponent's active Pokemon
+    type_1 = opponent_active_pokemon.type_1.name
+    type_2 = opponent_active_pokemon.type_2.name if opponent_active_pokemon.type_2 else None
+    def_matchup = defensive_type_matchup([type_1, type_2])
+    def_prompt = load_prompt("defensive_type_effectiveness.txt")
+    def_prompt = def_prompt.format(
+        Species=opponent_active_pokemon.species,
+        m4x=", ".join(def_matchup['4x']) if def_matchup['4x'] else "NONE",
+        m2x=", ".join(def_matchup['2x']) if def_matchup['2x'] else "NONE",
+        m0_5x=", ".join(def_matchup['0.5x']) if def_matchup['0.5x'] else "NONE",
+        m0_25x=", ".join(def_matchup['0.25x']) if def_matchup['0.25x'] else "NONE",
+        m0x=", ".join(def_matchup['0x']) if def_matchup['0x'] else "NONE",
+    )
+
+    # Get offensive type info for the opponent's active Pokemon
+    off_m1, off_m2 = offensive_type_matchup([type_1, type_2])
+    off_prompt = None
+    if off_m2:
+        off_prompt = load_prompt("offensive_two_type_effectiveness.txt")
+        off_prompt = off_prompt.format(
+            Species=opponent_active_pokemon.species,
+            Type1=type_1,
+            Type2=type_2,
+            supereffective1=", ".join(off_m1['2x']) if off_m1['2x'] else "NONE",
+            resisted1=", ".join(off_m1['0.5x']) if off_m1['0.5x'] else "NONE",
+            immune1=", ".join(off_m1['0x']) if off_m1['0x'] else "NONE",
+            supereffective2=", ".join(off_m2['2x']) if off_m2['2x'] else "NONE",
+            resisted2=", ".join(off_m2['0.5x']) if off_m2['0.5x'] else "NONE",
+            immune2=", ".join(off_m2['0x']) if off_m2['0x'] else "NONE",
+        )
+    else:
+        off_prompt = load_prompt("offensive_one_type_effectiveness.txt")
+        off_prompt = off_prompt.format(
+            Species=opponent_active_pokemon.species,
+            Type=type_1,
+            supereffective=", ".join(off_m1['2x']) if off_m1['2x'] else "NONE",
+            resisted=", ".join(off_m1['0.5x']) if off_m1['0.5x'] else "NONE",
+            immune=", ".join(off_m1['0x']) if off_m1['0x'] else "NONE",
+        )
+
     # Format opponent Pokemon information
     prompt_parts.append(f"Opponent has {opponent_team_count - fainted} Pokemon left.")
     prompt_parts.append(f"Opponent's active Pokemon: {opponent_active_pokemon.species} ({opponent_active_pokemon.current_hp_fraction * 100:.0f}% HP), Status: {opponent_active_pokemon.status}, Ability: {opponent_active_pokemon.ability if opponent_active_pokemon.ability else 'Unknown'}, Type 1: {opponent_active_pokemon.type_1.name} Type 2: {opponent_active_pokemon.type_2.name if opponent_active_pokemon.type_2 else 'None'}")
+    prompt_parts.append(def_prompt)
+    prompt_parts.append(off_prompt)
     for pokemon in opponents_observed_team:
         if pokemon.species != opponent_active_pokemon.species:
-            prompt_parts.append(f"Opponent's available swtich: {pokemon.species} ({pokemon.current_hp_fraction * 100:.0f}% HP)")
+            prompt_parts.append(f"Opponent's known available swtiches: {pokemon.species} ({pokemon.current_hp_fraction * 100:.0f}% HP)")
 
     # Player Pokemon information
     # Get the player's active Pokemon
@@ -60,9 +104,12 @@ def format_battle_prompt(battle):
         move_obj = available_moves[move]
         prompt_parts.append(f"Move: {name}, Base Power: {move_obj.base_power}, Type: {move_obj.type.name}, Category: {move_obj.category.name}")
     prompt_parts.append(f"Your available Pokemon:")
-    for pokemon in battle.available_switches:
-        prompt_parts.append(f"Available Switch: {pokemon.species} ({pokemon.current_hp_fraction * 100:.0f}% HP), Status: {pokemon.status}, Ability: {pokemon.ability}, Type 1: {pokemon.type_1.name} Type 2: {pokemon.type_2.name if pokemon.type_2 else 'None'}")
-    
+    if battle.available_switches:
+        for pokemon in battle.available_switches:
+            prompt_parts.append(f"Available Switch: {pokemon.species} ({pokemon.current_hp_fraction * 100:.0f}% HP), Status: {pokemon.status}, Ability: {pokemon.ability}, Type 1: {pokemon.type_1.name} Type 2: {pokemon.type_2.name if pokemon.type_2 else 'None'}")
+    else:
+        prompt_parts.append("No available switches.")
+
     return "\n".join(prompt_parts)
 
 # Use LLM convert last turn into a portion of a prompt
