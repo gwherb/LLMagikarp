@@ -4,7 +4,7 @@ from icecream import ic
 import json
 from .utils import load_prompt
 
-def move_prompt(battle_state):
+def move_prompt(battle_state, model):
     
     system_message = load_prompt("move_gen_system.txt")
     user_message = load_prompt("move_gen_user.txt")
@@ -43,7 +43,7 @@ def move_prompt(battle_state):
     load_dotenv(find_dotenv())
     client = OpenAI()
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model=model,
         messages=[
             {"role": "system", "content": prompt["system"]},
             {"role": "user", "content": prompt["human"]}

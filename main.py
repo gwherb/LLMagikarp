@@ -12,7 +12,7 @@ async def local():
     HeuristicsPlayer = SimpleHeuristicsPlayer()
 
     # Start the battle
-    await LLMagikarp.battle_against(HeuristicsPlayer, n_battles=1)
+    await LLMagikarp.battle_against(HeuristicsPlayer, n_battles=5)
 
 async def server():
 

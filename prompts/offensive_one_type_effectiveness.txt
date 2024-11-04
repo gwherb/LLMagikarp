@@ -1,1 +1,6 @@
-{Species} has stronger {Type} type attacks as a result of it's same type attack bonus (1.5x). This attack type is supereffective (2x) against {supereffective}, resisted (0.5x) by {resisted}, and immune (0x) to {immune}. Keep in mind that while this is the main attack type of the opposing Pokemon, it can use other typed moves as well.
+OFFENSIVE CAPABILITIES OF {Species} ({Type})
+-----------------------------------------
+STAB Bonus: 1.5x damage with {Type} moves
+Super Effective (2x):   {supereffective}
+Not Very Effective (0.5x): {resisted}
+No Effect (0x):        {immune}

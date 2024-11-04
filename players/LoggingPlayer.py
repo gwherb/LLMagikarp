@@ -9,60 +9,65 @@ class LoggingPlayer(Player):
         self._battle_logger = BattleLogger()
         self._game_started = False
         self._current_battle = None
+        self.LLM_model = 'gpt-4o-mini'
 
     async def battle_against(self, opponent, n_battles=1):
         """Override battle_against to add logging for local battles."""
-        if not self._game_started:
-            self._battle_logger.start_new_game("local")
-            self._game_started = True
+        # Store the original n_battles
+        total_battles = n_battles
         
-        await super().battle_against(opponent, n_battles)
-        
-        # Get the battle outcome from the most recent battle
-        if len(self._battles) > 0:
-            battle = list(self._battles.values())[-1]
-            won = battle.won
-            if won is not None:
-                outcome = "win" if won else "loss"
-            else:
-                outcome = "draw"
-        else:
-            outcome = "unknown"
+        # Run each battle separately to ensure proper logging
+        for battle_number in range(total_battles):
+            # Reset game state for new battle
+            self._game_started = False
             
-        self._battle_logger.end_game(outcome)
-        self._game_started = False
-
-    async def ladder(self, n_games):
-        """Override ladder to add logging for ladder battles."""
-        if not self._game_started:
-            self._battle_logger.start_new_game("ladder")
-            self._game_started = True
-        
-        await super().ladder(n_games)
-        
-        # Log the outcome with final rank
-        self._battle_logger.end_game(
-            outcome="completed",
-            final_rank=self.rating
-        )
-        self._game_started = False
+            # Start new battle log
+            if not self._game_started:
+                self._battle_logger = BattleLogger()  # Create new logger for each battle
+                self._battle_logger.start_new_game("local", self.LLM_model)
+                self._game_started = True
+            
+            # Run single battle
+            await super().battle_against(opponent, n_battles=1)
+            
+            # Get the battle outcome from the most recent battle
+            if len(self._battles) > 0:
+                battle = list(self._battles.values())[-1]
+                won = battle.won
+                if won is not None:
+                    outcome = "win" if won else "loss"
+                else:
+                    outcome = "draw"
+            else:
+                outcome = "unknown"
+                
+            # End the current battle log
+            self._battle_logger.end_game(outcome)
+            self._game_started = False
+            
+            # Clear any remaining battle state
+            self._current_battle = None
+            self._battles.clear()  # Clear battles dictionary after logging
 
     def choose_move(self, battle):
         """Override choose_move to add logging for each turn."""
         # Get battle state and decision
-        battle_state = format_battle_prompt(battle)
-        thought, action_type, action_name = move_prompt(battle_state)
-        
+        battle_state = format_battle_prompt(battle, self.LLM_model)
+        thought, action_type, action_name = move_prompt(battle_state, self.LLM_model)
+        ic(battle_state)
+
         # Log the turn
-        self._battle_logger.log_turn(
-            turn_number=battle.turn,
-            battle_state=battle_state,
-            thought=thought,
-            action_type=action_type,
-            action_name=action_name
-        )
+        if self._game_started:  # Only log if game is properly started
+            self._battle_logger.log_turn(
+                turn_number=battle.turn,
+                battle_state=battle_state,
+                thought=thought,
+                action_type=action_type,
+                action_name=action_name,
+                is_random=False
+            )
         
-        # Execute the move logic
+        # Execute move logic
         if action_type == "move":
             for move in battle.available_moves:
                 if move.id == action_name:
@@ -72,4 +77,18 @@ class LoggingPlayer(Player):
                 if switch.species == action_name:
                     return self.create_order(switch)
         
-        return self.choose_random_move(battle)
+        # If we get here, we need to make a random move
+        random_move = self.choose_random_move(battle)
+        
+        # Log the random move
+        if self._game_started:
+            self._battle_logger.log_turn(
+                turn_number=battle.turn,
+                battle_state=battle_state,
+                thought=thought,
+                action_type=action_type,
+                action_name=action_name,
+                is_random=True
+            )
+        
+        return random_move

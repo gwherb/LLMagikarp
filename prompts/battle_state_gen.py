@@ -5,7 +5,9 @@ from dotenv import load_dotenv, find_dotenv
 from .utils import load_prompt
 from .type_effectiveness import *
 
-def format_battle_prompt(battle):
+historical_turn_2 = None
+
+def format_battle_prompt(battle, model):
     """
     Format battle observations into a structured prompt for decision making.
     
@@ -22,10 +24,23 @@ def format_battle_prompt(battle):
     
     prompt_parts = []
     
-    # Format historical turns from events
-    historical_turns = get_last_turn_observation(obs.events)
-    prompt_parts.append(f"Turn {current_turn} (Last turn):")
-    prompt_parts.append(historical_turns)
+    # Format battle header
+    prompt_parts.append(f"BATTLE STATE - TURN {current_turn + 1}")
+    prompt_parts.append("============================\n")
+
+    # Format historical turns
+    global historical_turn_2
+    if historical_turn_2:
+        prompt_parts.append(f"PREVIOUS TURN ({current_turn - 1}):")
+        prompt_parts.append(historical_turn_2)
+        prompt_parts.append("")
+    
+    historical_turn_1 = get_last_turn_observation(obs.events, model)
+    prompt_parts.append(f"LAST TURN ({current_turn}):")
+    prompt_parts.append(historical_turn_1)
+    prompt_parts.append("")
+    historical_turn_2 = historical_turn_1
+    
     
     # Current turn information
     prompt_parts.append(f"Turn {current_turn + 1} (Current turn):")
@@ -39,6 +54,11 @@ def format_battle_prompt(battle):
         pokemon for pokemon in battle.opponent_team.values() if pokemon.fainted
     ])
 
+    # Format opponent section
+    prompt_parts.append("OPPONENT STATUS")
+    prompt_parts.append("--------------")
+    prompt_parts.append(f"Remaining Pokemon: {opponent_team_count - fainted}/6\n")
+
     # Get the opponent's active Pokemon
     opponent_active_pokemon = battle.opponent_active_pokemon
 
@@ -49,14 +69,15 @@ def format_battle_prompt(battle):
     def_prompt = load_prompt("defensive_type_effectiveness.txt")
     def_prompt = def_prompt.format(
         Species=opponent_active_pokemon.species,
+        Type1=type_1,
+        Type2=type_2,
         m4x=", ".join(def_matchup['4x']) if def_matchup['4x'] else "NONE",
         m2x=", ".join(def_matchup['2x']) if def_matchup['2x'] else "NONE",
+        m1x=", ".join(def_matchup['1x']) if def_matchup['1x'] else "NONE",
         m0_5x=", ".join(def_matchup['0.5x']) if def_matchup['0.5x'] else "NONE",
         m0_25x=", ".join(def_matchup['0.25x']) if def_matchup['0.25x'] else "NONE",
         m0x=", ".join(def_matchup['0x']) if def_matchup['0x'] else "NONE",
     )
-
-    # Get offensive type info for the opponent's active Pokemon
     off_m1, off_m2 = offensive_type_matchup([type_1, type_2])
     off_prompt = None
     if off_m2:
@@ -82,38 +103,71 @@ def format_battle_prompt(battle):
             immune=", ".join(off_m1['0x']) if off_m1['0x'] else "NONE",
         )
 
-    # Format opponent Pokemon information
-    prompt_parts.append(f"Opponent has {opponent_team_count - fainted} Pokemon left.")
-    prompt_parts.append(f"Opponent's active Pokemon: {opponent_active_pokemon.species} ({opponent_active_pokemon.current_hp_fraction * 100:.0f}% HP), Status: {opponent_active_pokemon.status}, Ability: {opponent_active_pokemon.ability if opponent_active_pokemon.ability else 'Unknown'}, Type 1: {opponent_active_pokemon.type_1.name} Type 2: {opponent_active_pokemon.type_2.name if opponent_active_pokemon.type_2 else 'None'}")
+    # Format active opponent Pokemon
+    prompt_parts.append(f"ACTIVE POKEMON: {opponent_active_pokemon.species}")
+    prompt_parts.append(f"HP: {opponent_active_pokemon.current_hp_fraction * 100:.0f}%")
+    prompt_parts.append(f"Status: {opponent_active_pokemon.status}")
+    prompt_parts.append(f"Ability: {opponent_active_pokemon.ability if opponent_active_pokemon.ability else 'Unknown'}")
+    prompt_parts.append(f"Type: {opponent_active_pokemon.type_1.name}/{opponent_active_pokemon.type_2.name if opponent_active_pokemon.type_2 else 'None'}\n")
+    
+    # Add type analysis sections
+    prompt_parts.append("[DEFENSIVE ANALYSIS]")
     prompt_parts.append(def_prompt)
+    prompt_parts.append("")
+    prompt_parts.append("[OFFENSIVE ANALYSIS]")
     prompt_parts.append(off_prompt)
-    for pokemon in opponents_observed_team:
-        if pokemon.species != opponent_active_pokemon.species:
-            prompt_parts.append(f"Opponent's known available swtiches: {pokemon.species} ({pokemon.current_hp_fraction * 100:.0f}% HP)")
+    prompt_parts.append("")
 
     # Player Pokemon information
-    # Get the player's active Pokemon
     player_active_pokemon = battle.active_pokemon
 
-    # Format player Pokemon information
-    prompt_parts.append(f"Your active Pokemon: {player_active_pokemon.species} ({player_active_pokemon.current_hp_fraction * 100:.0f}% HP), Status: {player_active_pokemon.status}, Ability: {player_active_pokemon.ability}, Type 1: {player_active_pokemon.type_1.name} Type 2: {player_active_pokemon.type_2.name if player_active_pokemon.type_2 else 'None'}")
-    prompt_parts.append(f"Your active Pokemon has the following moves:")
+    # Format your Pokemon section
+    prompt_parts.append("YOUR STATUS")
+    prompt_parts.append("----------")
+    prompt_parts.append(f"ACTIVE POKEMON: {player_active_pokemon.species}")
+    prompt_parts.append(f"HP: {player_active_pokemon.current_hp_fraction * 100:.0f}%")
+    prompt_parts.append(f"Status: {player_active_pokemon.status}")
+    prompt_parts.append(f"Ability: {player_active_pokemon.ability}")
+    prompt_parts.append(f"Type: {player_active_pokemon.type_1.name}/{player_active_pokemon.type_2.name if player_active_pokemon.type_2 else 'None'}\n")
+    
+    # Format moves
     available_moves = player_active_pokemon.moves
+    prompt_parts.append("AVAILABLE MOVES:")
     for move in available_moves:
-        name = move
-        move_obj = available_moves[move]
-        prompt_parts.append(f"Move: {name}, Base Power: {move_obj.base_power}, Type: {move_obj.type.name}, Category: {move_obj.category.name}")
-    prompt_parts.append(f"Your available Pokemon:")
+        prompt_parts.append(
+            f"- {move}: {available_moves[move].type.name} | "
+            f"Power: {available_moves[move].base_power} | "
+            f"Category: {available_moves[move].category.name} | "
+            f"Priority: {available_moves[move].priority} | "
+            f"Effect: {available_moves[move].secondary}"
+        )
+    prompt_parts.append("")
+    
+    # Format switches section
     if battle.available_switches:
+        prompt_parts.append("AVAILABLE SWITCHES:")
         for pokemon in battle.available_switches:
-            prompt_parts.append(f"Available Switch: {pokemon.species} ({pokemon.current_hp_fraction * 100:.0f}% HP), Status: {pokemon.status}, Ability: {pokemon.ability}, Type 1: {pokemon.type_1.name} Type 2: {pokemon.type_2.name if pokemon.type_2 else 'None'}")
+            prompt_parts.append(
+                f"- {pokemon.species} ({pokemon.current_hp_fraction * 100:.0f}% HP) | "
+                f"Status: {pokemon.status} | "
+                f"Ability: {pokemon.ability} | "
+                f"Type: {pokemon.type_1.name}/{pokemon.type_2.name if pokemon.type_2 else 'None'}"
+            )
+            prompt_parts.append("  Moves:")
+            for move in pokemon.moves:
+                prompt_parts.append(
+                    f"  * {move}: {pokemon.moves[move].type.name} | "
+                    f"Power: {pokemon.moves[move].base_power} | "
+                    f"Category: {pokemon.moves[move].category.name}"
+                )
+            prompt_parts.append("")
     else:
-        prompt_parts.append("No available switches.")
+        prompt_parts.append("AVAILABLE SWITCHES: None\n")
 
     return "\n".join(prompt_parts)
 
 # Use LLM convert last turn into a portion of a prompt
-def get_last_turn_observation(events):
+def get_last_turn_observation(events, model):
     """
     Creates a prompt for an LLM to translate Pokemon battle events into natural language.
     
@@ -148,7 +202,7 @@ def get_last_turn_observation(events):
     try:
         # Make the API call using the new format
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=model,
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": user_message}
