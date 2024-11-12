@@ -59,6 +59,14 @@ def move_prompt(battle_state, model):
     
     # Return the three specific fields
     # ic(function_args)
+    
+    # Fix for when actions are not properly generated:
+    if 'action_type' not in function_args:
+        function_args['action_type'] = None
+
+    if 'action_name' not in function_args:
+        function_args['action_name'] = None
+
     return (
         function_args["Thought"],
         function_args["action_type"],
@@ -106,7 +114,7 @@ def test_move_prompt():
             '
              'Available Switch: dugtrio (100% HP), Status: None, Ability: arenatrap, Type '
              '1: GROUND Type 2: None'''
-    ic(move_prompt(battle_state))
+    # ic(move_prompt(battle_state))
 
 if __name__ == "__main__":
     test_move_prompt()

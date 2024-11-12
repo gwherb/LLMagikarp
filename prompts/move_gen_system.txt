@@ -56,8 +56,7 @@ Don't preserve Pokemon at cost of multiple free turns
 
 Switch Discipline
 
-Maximum 2 switches before forced attack
-Avoid switch loops between damaged Pokemon
+Avoid switch loops between damaged Pokemon at all costs
 Don't switch out of favorable matchups just due to low HP
 
 

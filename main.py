@@ -12,7 +12,7 @@ async def local():
     HeuristicsPlayer = SimpleHeuristicsPlayer()
 
     # Start the battle
-    await LLMagikarp.battle_against(HeuristicsPlayer, n_battles=5)
+    await LLMagikarp.battle_against(HeuristicsPlayer, n_battles=1)
 
 async def server():
 
@@ -24,6 +24,17 @@ async def server():
 
     await player.send_challenges("LLMagikarp", n_challenges=1)
 
+async def ladder():
+
+    LLMagikarp = LoggingPlayer(
+        account_configuration=AccountConfiguration("gwherb", "Just4Gh!"),
+        server_configuration=ShowdownServerConfiguration,
+    )
+
+    await LLMagikarp.ladder(1)
+
+    for battle in LLMagikarp.battles.values():
+        print(battle.rating, battle.opponent_rating)
 
 if __name__ == "__main__":
     asyncio.get_event_loop().run_until_complete(local())

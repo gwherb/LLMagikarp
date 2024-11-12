@@ -110,6 +110,10 @@ def format_battle_prompt(battle, model):
     prompt_parts.append(f"Ability: {opponent_active_pokemon.ability if opponent_active_pokemon.ability else 'Unknown'}")
     prompt_parts.append(f"Type: {opponent_active_pokemon.type_1.name}/{opponent_active_pokemon.type_2.name if opponent_active_pokemon.type_2 else 'None'}\n")
     
+    stats = estimate_stats(opponent_active_pokemon)
+    if stats:
+        prompt_parts.append(f"Estimated Stats: Attack - {stats['attack']}, Defense - {stats['defense']}, Special Attack - {stats['special-attack']}, Special Defense - {stats['special-defense']}, Speed - {stats['speed']}\n")
+    
     # Add type analysis sections
     prompt_parts.append("[DEFENSIVE ANALYSIS]")
     prompt_parts.append(def_prompt)
@@ -129,6 +133,7 @@ def format_battle_prompt(battle, model):
     prompt_parts.append(f"Status: {player_active_pokemon.status}")
     prompt_parts.append(f"Ability: {player_active_pokemon.ability}")
     prompt_parts.append(f"Type: {player_active_pokemon.type_1.name}/{player_active_pokemon.type_2.name if player_active_pokemon.type_2 else 'None'}\n")
+    prompt_parts.append(f"Stats: Attack - {player_active_pokemon.stats['atk']}, Defense - {player_active_pokemon.stats['def']}, Special Attack - {player_active_pokemon.stats['spa']}, Special Defense - {player_active_pokemon.stats['spd']}, Speed - {player_active_pokemon.stats['spe']}\n")
     
     # Format moves
     available_moves = player_active_pokemon.moves
@@ -151,7 +156,8 @@ def format_battle_prompt(battle, model):
                 f"- {pokemon.species} ({pokemon.current_hp_fraction * 100:.0f}% HP) | "
                 f"Status: {pokemon.status} | "
                 f"Ability: {pokemon.ability} | "
-                f"Type: {pokemon.type_1.name}/{pokemon.type_2.name if pokemon.type_2 else 'None'}"
+                f"Type: {pokemon.type_1.name}/{pokemon.type_2.name if pokemon.type_2 else 'None'} | "
+                f"Stats: Attack - {pokemon.stats['atk']}, Defense - {pokemon.stats['def']}, Special Attack - {pokemon.stats['spa']}, Special Defense - {pokemon.stats['spd']}, Speed - {pokemon.stats['spe']}"
             )
             prompt_parts.append("  Moves:")
             for move in pokemon.moves:
@@ -217,7 +223,46 @@ def get_last_turn_observation(events, model):
     except Exception as e:
         print(f"Error calling ChatGPT API: {e}")
         return f"Last turn events: {events_text}"
+
+def estimate_stats(pokemon) -> dict[str, int]:
+    if not pokemon or not pokemon.base_stats:
+        return None
     
+    # Constants for calculation
+    level = pokemon.level  # Level 100 Pokemon
+    iv = 32  # Maximum IVs
+    ev_invested = 252  # Maximum EVs for invested stats
+    ev_uninvested = 0  # No EVs for uninvested stats
+    
+    def calculate_stat(base: int, level: int, iv: int, ev: int, nature: float = 1.0) -> int:
+        return (((2 * base + iv + (ev // 4)) * level // 100) + 5) * nature
+    
+    # Get relevant base stats (excluding HP)
+    stats_list = [
+        ("attack", pokemon.base_stats["atk"]),
+        ("defense", pokemon.base_stats["def"]),
+        ("special-attack", pokemon.base_stats["spa"]),
+        ("special-defense", pokemon.base_stats["spd"]),
+        ("speed", pokemon.base_stats["spe"])
+    ]
+    
+    # Sort stats by base value to determine likely EV investment
+    sorted_stats = sorted(stats_list, key=lambda x: x[1], reverse=True)
+    primary_stat = sorted_stats[0][0]
+    # Secondary stat is always speed stat to maximize speed control
+    secondary_stat = "speed"
+    
+    # Calculate stats
+    stats = {}
+    for stat_name, base_value in stats_list:
+        ev = ev_invested if stat_name in (primary_stat, secondary_stat) else ev_uninvested
+        nature = 1.0
+        if stat_name == "speed":
+            nature = 1.1 if primary_stat == "speed" else 1.0
+        stats[stat_name] = calculate_stat(base_value, level, iv, ev, nature=nature)
+    
+    return stats
+
 def test_historic_prompt():
     # Test the function
     events=[['',
@@ -242,7 +287,7 @@ def test_historic_prompt():
             '[from] item: Leftovers'],
             ['', 'upkeep'],
             ['', 'turn', '15']]
-    ic(get_last_turn_observation(events))  # Should return a natural language summary
+    # ic(get_last_turn_observation(events))  # Should return a natural language summary
 
 if __name__ == "__main__":
     test_historic_prompt()
