@@ -32,3 +32,6 @@ typing-extensions==4.12.2
 urllib3==2.2.3
 websockets==13.1
 pandas==2.2.3
+google-api-python-client==2.153.0
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.2.1

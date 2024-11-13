@@ -40,3 +40,9 @@ env/
 
 # Remove logs
 logs/
+
+# Remove Google API credentials
+credentials.json
+
+# Remove the cache
+upload_cache.json
