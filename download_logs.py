@@ -14,12 +14,8 @@ class DriveDownloader:
     def __init__(self):
         self.SCOPES = ['https://www.googleapis.com/auth/drive.file']
         self.creds = None
-        self.cache_file = 'upload_cache.json'
-        self.cache_folder_name = 'cache'
-        self.cache_folder_id = None
+        self.logs_dir = './logs'
         self.service = self.authenticate()
-        print("Initializing cache from Drive...")
-        self.download_cache = self._initialize_cache()
         
     def authenticate(self):
         if os.path.exists('token.pickle'):
@@ -39,22 +35,8 @@ class DriveDownloader:
         
         return build('drive', 'v3', credentials=self.creds)
 
-    def _initialize_cache(self):
-        """Initialize cache from Drive."""
-        if os.path.exists(self.cache_file):
-            try:
-                with open(self.cache_file, 'r') as f:
-                    return json.load(f)
-            except json.JSONDecodeError:
-                print("Error reading local cache, creating new one")
-        return {'folders': {}, 'files': {}}
-
     def find_folder(self, folder_name, parent_id=None):
-        """Find a folder in Drive using cache first."""
-        cache_key = f"{parent_id or 'root'}:{folder_name}"
-        if cache_key in self.download_cache['folders']:
-            return self.download_cache['folders'][cache_key]
-        
+        """Find a folder in Drive."""
         query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder'"
         if parent_id:
             query += f" and '{parent_id}' in parents"
@@ -68,9 +50,7 @@ class DriveDownloader:
             files = results.get('files', [])
             
             if files:
-                folder_id = files[0]['id']
-                self.download_cache['folders'][cache_key] = folder_id
-                return folder_id
+                return files[0]['id']
             return None
         except Exception as e:
             print(f'Error finding folder: {e}')
@@ -88,13 +68,13 @@ class DriveDownloader:
                     q=query,
                     spaces='drive',
                     fields='nextPageToken, files(id, name)',
-                    pageSize=1000,  # Maximum page size
-                    pageToken=page_token
+                    pageSize=1000,
+                    pageToken=page_token,
+                    orderBy='name'  # Sort by name for consistent ordering
                 ).execute()
                 
                 all_folders.extend(results.get('files', []))
                 
-                # Get the next page token
                 page_token = results.get('nextPageToken')
                 if not page_token:
                     break
@@ -106,16 +86,10 @@ class DriveDownloader:
         print(f"Found {len(all_folders)} folders in Drive")
         return all_folders
 
-    def download_file(self, file_id, output_path, force=False):
-        """Download a file from Drive. If force is True, download regardless of cache."""
-        if os.path.exists(output_path) and not force:
-            # Check if we need to update the file
-            cache_key = f"{os.path.dirname(output_path)}:{os.path.basename(output_path)}"
-            if cache_key in self.download_cache['files']:
-                return False  # File exists and is in cache, skip download
-        
+    def download_file(self, file_id, output_path):
+        """Download a file from Drive."""
         try:
-            # First get the file metadata to get the size
+            # Get file size for progress bar
             file_metadata = self.service.files().get(fileId=file_id, fields='size').execute()
             total_size = int(file_metadata.get('size', 0))
             
@@ -125,7 +99,7 @@ class DriveDownloader:
             
             # Setup progress bar with known total size
             with tqdm(total=total_size, unit='B', unit_scale=True, 
-                    desc=f"Downloading {os.path.basename(output_path)}") as pbar:
+                     desc=f"Downloading {os.path.basename(output_path)}") as pbar:
                 done = False
                 last_progress = 0
                 
@@ -134,7 +108,7 @@ class DriveDownloader:
                         status, done = downloader.next_chunk()
                         if status:
                             current = int(status.progress() * total_size)
-                            pbar.update(current - last_progress)  # Update only the difference
+                            pbar.update(current - last_progress)
                             last_progress = current
                     except Exception as chunk_error:
                         print(f"\nError during chunk download: {chunk_error}")
@@ -146,29 +120,10 @@ class DriveDownloader:
                 fh.seek(0)
                 f.write(fh.read())
             
-            # Update cache
-            cache_key = f"{os.path.dirname(output_path)}:{os.path.basename(output_path)}"
-            self.download_cache['files'][cache_key] = {
-                'id': file_id,
-                'downloaded_at': datetime.now().isoformat()
-            }
-            
             return True
         except Exception as e:
             print(f'Error downloading file: {e}')
             return False
-
-def count_pending_downloads(battle_logs_id, timestamp_folders, downloader):
-    """Count how many files need to be downloaded."""
-    count = 0
-    logs_dir = './logs'
-    
-    for folder in timestamp_folders:
-        local_path = os.path.join(logs_dir, folder['name'], 'battle_log.json')
-        if not os.path.exists(local_path):
-            count += 1
-    
-    return count
 
 def download_logs():
     print("Initializing Drive downloader...")
@@ -184,25 +139,25 @@ def download_logs():
     print("Fetching folder list from Drive...")
     timestamp_folders = downloader.list_timestamp_folders(battle_logs_id)
     
-    # Count total operations needed
-    total_operations = count_pending_downloads(battle_logs_id, timestamp_folders, downloader)
+    # Create list of files to download by comparing with local files
+    download_queue = []
+    for folder in timestamp_folders:
+        local_path = os.path.join(downloader.logs_dir, folder['name'], 'battle_log.json')
+        if not os.path.exists(local_path):
+            download_queue.append(folder)
     
-    if total_operations == 0:
+    if not download_queue:
         print("No new files to download.")
         return
     
-    print(f"Found {total_operations} pending download operations")
+    print(f"Found {len(download_queue)} files to download")
     
     # Download logs
     downloaded_count = 0
-    skipped_count = 0
+    error_count = 0
     
-    with tqdm(total=total_operations, desc="Overall Progress", unit="file") as pbar:
-        for folder in timestamp_folders:
-            # Construct local path
-            local_folder_path = os.path.join('./logs', folder['name'])
-            local_file_path = os.path.join(local_folder_path, 'battle_log.json')
-            
+    with tqdm(total=len(download_queue), desc="Overall Progress", unit="file") as pbar:
+        for folder in download_queue:
             # Find battle_log.json in the timestamp folder
             query = f"name='battle_log.json' and '{folder['id']}' in parents"
             results = downloader.service.files().list(
@@ -213,20 +168,20 @@ def download_logs():
             
             files = results.get('files', [])
             if files:
-                if downloader.download_file(files[0]['id'], local_file_path):
+                local_path = os.path.join(downloader.logs_dir, folder['name'], 'battle_log.json')
+                if downloader.download_file(files[0]['id'], local_path):
                     downloaded_count += 1
-                    pbar.update(1)
                 else:
-                    skipped_count += 1
+                    error_count += 1
+            else:
+                print(f"\nWarning: No battle_log.json found in folder {folder['name']}")
+                error_count += 1
+            
+            pbar.update(1)
     
     print(f"\nDownload Summary:")
-    print(f"Files downloaded: {downloaded_count}")
-    print(f"Files skipped (already existed): {skipped_count}")
-    
-    # Save cache
-    with open(downloader.cache_file, 'w') as f:
-        json.dump(downloader.download_cache, f, indent=2)
-    print("Cache updated")
+    print(f"Files downloaded successfully: {downloaded_count}")
+    print(f"Files with errors: {error_count}")
 
 if __name__ == '__main__':
     download_logs()

@@ -8,7 +8,6 @@ import json
 from datetime import datetime
 from collections import defaultdict
 from tabulate import tabulate
-import sys
 
 class LogDiagnostics:
     def __init__(self):
@@ -22,7 +21,6 @@ class LogDiagnostics:
         self.local_data = None
         
     def authenticate(self):
-        """Authenticate with Google Drive."""
         if os.path.exists('token.pickle'):
             with open('token.pickle', 'rb') as token:
                 self.creds = pickle.load(token)
@@ -41,7 +39,6 @@ class LogDiagnostics:
         return build('drive', 'v3', credentials=self.creds)
 
     def _load_cache(self):
-        """Load the cache file."""
         try:
             if os.path.exists(self.cache_file):
                 with open(self.cache_file, 'r') as f:
@@ -51,8 +48,12 @@ class LogDiagnostics:
             print("Error reading cache file")
             return {'folders': {}, 'files': {}}
 
+    def _save_cache(self):
+        with open(self.cache_file, 'w') as f:
+            json.dump(self.cache_data, f, indent=2)
+
     def scan_drive(self):
-        """Scan Google Drive for battle logs."""
+        """Scan Google Drive for battle logs with pagination."""
         print("Scanning Google Drive...")
         drive_data = defaultdict(dict)
         
@@ -67,32 +68,47 @@ class LogDiagnostics:
             print("BattleLogs folder not found in cache!")
             return drive_data
         
-        # Get all timestamp folders
-        query = f"'{battle_logs_id}' in parents and mimeType='application/vnd.google-apps.folder'"
-        try:
-            results = self.service.files().list(
-                q=query,
-                spaces='drive',
-                fields='files(id, name)',
-                pageSize=1000
-            ).execute()
-            
-            # For each timestamp folder, look for battle_log.json
-            for folder in results.get('files', []):
-                file_query = f"name='battle_log.json' and '{folder['id']}' in parents"
-                file_results = self.service.files().list(
-                    q=file_query,
-                    fields='files(id, name, modifiedTime)'
+        # Get all timestamp folders with pagination
+        page_token = None
+        folder_count = 0
+        
+        while True:
+            query = f"'{battle_logs_id}' in parents and mimeType='application/vnd.google-apps.folder'"
+            try:
+                results = self.service.files().list(
+                    q=query,
+                    spaces='drive',
+                    fields='nextPageToken, files(id, name)',
+                    pageSize=1000,
+                    pageToken=page_token
                 ).execute()
                 
-                files = file_results.get('files', [])
-                if files:
-                    drive_data[folder['name']]['file_id'] = files[0]['id']
-                    drive_data[folder['name']]['modified'] = files[0]['modifiedTime']
+                for folder in results.get('files', []):
+                    folder_count += 1
+                    # Find battle_log.json in each folder
+                    file_query = f"name='battle_log.json' and '{folder['id']}' in parents"
+                    file_results = self.service.files().list(
+                        q=file_query,
+                        fields='files(id, name, modifiedTime)'
+                    ).execute()
+                    
+                    files = file_results.get('files', [])
+                    if files:
+                        drive_data[folder['name']] = {
+                            'folder_id': folder['id'],
+                            'file_id': files[0]['id'],
+                            'modified': files[0]['modifiedTime']
+                        }
+                
+                page_token = results.get('nextPageToken')
+                if not page_token:
+                    break
+                    
+            except Exception as e:
+                print(f"Error scanning Drive: {e}")
+                break
         
-        except Exception as e:
-            print(f"Error scanning Drive: {e}")
-        
+        print(f"Found {folder_count} folders in Drive")
         self.drive_data = drive_data
         return drive_data
 
@@ -114,6 +130,45 @@ class LogDiagnostics:
         self.local_data = local_data
         return local_data
 
+    def update_cache_from_drive(self):
+        """Update cache to match Drive contents."""
+        print("\nUpdating cache to match Drive contents...")
+        
+        # Get BattleLogs folder ID
+        battle_logs_id = None
+        for cache_key, folder_id in self.cache_data['folders'].items():
+            if cache_key.endswith(':BattleLogs'):
+                battle_logs_id = folder_id
+                break
+        
+        if not battle_logs_id:
+            print("Error: BattleLogs folder ID not found in cache")
+            return
+        
+        # Create new cache structure
+        new_cache = {
+            'folders': {'root:BattleLogs': battle_logs_id},
+            'files': {}
+        }
+        
+        # Add all folders and files from Drive scan
+        for timestamp, data in self.drive_data.items():
+            # Add folder to cache
+            folder_cache_key = f"{battle_logs_id}:{timestamp}"
+            new_cache['folders'][folder_cache_key] = data['folder_id']
+            
+            # Add file to cache
+            file_cache_key = f"{data['folder_id']}:battle_log.json"
+            new_cache['files'][file_cache_key] = {
+                'id': data['file_id'],
+                'uploaded_at': data['modified']
+            }
+        
+        # Update cache
+        self.cache_data = new_cache
+        self._save_cache()
+        print("Cache updated successfully")
+
     def analyze_discrepancies(self):
         """Analyze discrepancies between Drive, cache, and local files."""
         if not self.drive_data:
@@ -125,38 +180,31 @@ class LogDiagnostics:
         all_timestamps = set()
         all_timestamps.update(self.drive_data.keys())
         all_timestamps.update(self.local_data.keys())
-        all_timestamps.update(folder_name for _, folder_name in 
-                            [key.split(':') for key in self.cache_data['folders'].keys() 
-                             if key.startswith('1MG7hC406ZBcE2WQPhFY0TiJqXOoUNti2:')])
         
         discrepancies = []
         
         for timestamp in sorted(all_timestamps):
             in_drive = timestamp in self.drive_data
             in_local = timestamp in self.local_data
-            in_cache = any(key.endswith(f":{timestamp}") for key in self.cache_data['folders'].keys())
             
             status = []
-            if not (in_drive and in_local and in_cache):
+            if not (in_drive and in_local):
                 if not in_drive:
                     status.append("Missing from Drive")
                 if not in_local:
                     status.append("Missing locally")
-                if not in_cache:
-                    status.append("Missing from cache")
                 
                 discrepancies.append([
                     timestamp,
                     "✓" if in_drive else "✗",
                     "✓" if in_local else "✗",
-                    "✓" if in_cache else "✗",
                     " & ".join(status)
                 ])
         
         return discrepancies
 
     def print_report(self):
-        """Print a detailed report of the analysis."""
+        """Print a detailed report and update cache."""
         discrepancies = self.analyze_discrepancies()
         
         print("\n=== Log Files Diagnostic Report ===\n")
@@ -164,25 +212,24 @@ class LogDiagnostics:
         # Summary counts
         drive_count = len(self.drive_data)
         local_count = len(self.local_data)
-        cache_count = len([k for k in self.cache_data['folders'].keys() 
-                         if k.startswith('1MG7hC406ZBcE2WQPhFY0TiJqXOoUNti2:')])
         
         print(f"Total files found:")
         print(f"  - In Google Drive: {drive_count}")
         print(f"  - In local directory: {local_count}")
-        print(f"  - In cache: {cache_count}\n")
         
         if not discrepancies:
-            print("✓ No discrepancies found! All systems are in sync.")
+            print("\n✓ No discrepancies found between Drive and local files!")
         else:
-            print(f"Found {len(discrepancies)} discrepancies:\n")
-            headers = ["Timestamp", "Drive", "Local", "Cache", "Issues"]
+            print(f"\nFound {len(discrepancies)} discrepancies:\n")
+            headers = ["Timestamp", "Drive", "Local", "Issues"]
             print(tabulate(discrepancies, headers=headers, tablefmt="grid"))
             
             print("\nRecommended actions:")
             print("1. For files missing locally: Run download_logs.py")
             print("2. For files missing from Drive: Run upload_logs.py")
-            print("3. For cache mismatches: The cache will be updated automatically when running either script")
+        
+        # Update cache to match Drive
+        self.update_cache_from_drive()
 
 def main():
     diagnostics = LogDiagnostics()
