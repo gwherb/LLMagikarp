@@ -46,3 +46,6 @@ credentials.json
 
 # Remove the cache
 upload_cache.json
+
+# Ignore pickle
+token.pickle
