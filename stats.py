@@ -46,7 +46,7 @@ def get_stats(stats_dict, game_type, start_date, end_date):
             stats_dict["losses"] += 1
             last_turn_state = battle_log["turns"][-1]["battle_state"]
             remaining_pokemon = re.search('Remaining Pokemon: (\d)/', last_turn_state)
-            if int(remaining_pokemon.group(1)) <= 2:
+            if remaining_pokemon and int(remaining_pokemon.group(1)) <= 2:
                 stats_dict["close_losses"] += 1
         else:
             stats_dict["error_matches"] += 1

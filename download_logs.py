@@ -91,9 +91,9 @@ class DriveDownloader:
             print(f'Error listing folders: {e}')
             return []
 
-    def download_file(self, file_id, output_path):
-        """Download a file from Drive."""
-        if os.path.exists(output_path):
+    def download_file(self, file_id, output_path, force=False):
+        """Download a file from Drive. If force is True, download regardless of cache."""
+        if os.path.exists(output_path) and not force:
             # Check if we need to update the file
             cache_key = f"{os.path.dirname(output_path)}:{os.path.basename(output_path)}"
             if cache_key in self.download_cache['files']:
@@ -104,13 +104,19 @@ class DriveDownloader:
             fh = io.BytesIO()
             downloader = MediaIoBaseDownload(fh, request)
             
-            # Setup progress bar
+            # Setup progress bar without total size
+            print(f"Downloading {os.path.basename(output_path)}...")
             done = False
-            with tqdm(desc=f"Downloading {os.path.basename(output_path)}", unit='B', unit_scale=True) as pbar:
-                while done is False:
+            while done is False:
+                try:
                     status, done = downloader.next_chunk()
                     if status:
-                        pbar.update(int(status.progress() * pbar.total))
+                        print(f"Downloaded {int(status.progress() * 100)}%", end='\r')
+                except Exception as chunk_error:
+                    print(f"\nError during chunk download: {chunk_error}")
+                    return False
+            
+            print("\nDownload complete")
             
             # Save the file
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
