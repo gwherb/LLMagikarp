@@ -78,18 +78,33 @@ class DriveDownloader:
 
     def list_timestamp_folders(self, battle_logs_id):
         """List all timestamp folders in the BattleLogs folder."""
-        query = f"'{battle_logs_id}' in parents and mimeType='application/vnd.google-apps.folder'"
+        all_folders = []
+        page_token = None
         
-        try:
-            results = self.service.files().list(
-                q=query,
-                spaces='drive',
-                fields='files(id, name)'
-            ).execute()
-            return results.get('files', [])
-        except Exception as e:
-            print(f'Error listing folders: {e}')
-            return []
+        while True:
+            query = f"'{battle_logs_id}' in parents and mimeType='application/vnd.google-apps.folder'"
+            try:
+                results = self.service.files().list(
+                    q=query,
+                    spaces='drive',
+                    fields='nextPageToken, files(id, name)',
+                    pageSize=1000,  # Maximum page size
+                    pageToken=page_token
+                ).execute()
+                
+                all_folders.extend(results.get('files', []))
+                
+                # Get the next page token
+                page_token = results.get('nextPageToken')
+                if not page_token:
+                    break
+                    
+            except Exception as e:
+                print(f'Error listing folders: {e}')
+                break
+        
+        print(f"Found {len(all_folders)} folders in Drive")
+        return all_folders
 
     def download_file(self, file_id, output_path, force=False):
         """Download a file from Drive. If force is True, download regardless of cache."""
@@ -100,23 +115,30 @@ class DriveDownloader:
                 return False  # File exists and is in cache, skip download
         
         try:
+            # First get the file metadata to get the size
+            file_metadata = self.service.files().get(fileId=file_id, fields='size').execute()
+            total_size = int(file_metadata.get('size', 0))
+            
             request = self.service.files().get_media(fileId=file_id)
             fh = io.BytesIO()
             downloader = MediaIoBaseDownload(fh, request)
             
-            # Setup progress bar without total size
-            print(f"Downloading {os.path.basename(output_path)}...")
-            done = False
-            while done is False:
-                try:
-                    status, done = downloader.next_chunk()
-                    if status:
-                        print(f"Downloaded {int(status.progress() * 100)}%", end='\r')
-                except Exception as chunk_error:
-                    print(f"\nError during chunk download: {chunk_error}")
-                    return False
-            
-            print("\nDownload complete")
+            # Setup progress bar with known total size
+            with tqdm(total=total_size, unit='B', unit_scale=True, 
+                    desc=f"Downloading {os.path.basename(output_path)}") as pbar:
+                done = False
+                last_progress = 0
+                
+                while done is False:
+                    try:
+                        status, done = downloader.next_chunk()
+                        if status:
+                            current = int(status.progress() * total_size)
+                            pbar.update(current - last_progress)  # Update only the difference
+                            last_progress = current
+                    except Exception as chunk_error:
+                        print(f"\nError during chunk download: {chunk_error}")
+                        return False
             
             # Save the file
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
