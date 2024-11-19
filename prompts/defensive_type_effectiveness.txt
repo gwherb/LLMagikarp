@@ -3,5 +3,5 @@ DEFENSIVE TYPE EFFECTIVENESS FOR {Species}
 Super Weak (4x):   {m4x}
 Weak (2x):         {m2x}
 Resistant (0.5x):  {m0_5x}
-V.Resistant(0.25x):{m0_25x}
+Very Resistant(0.25x):{m0_25x}
 Immune (0x):       {m0x}

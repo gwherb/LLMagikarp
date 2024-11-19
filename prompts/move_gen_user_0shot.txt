@@ -1,0 +1,6 @@
+Below is the current battle state. Analyze it and provide strategic reasoning for your recommended action.
+Remember, to consider that switching is important to create favorable matchups, but switching too much can create a scenario where you are consistently taking damage without dealing any in return.
+Battle state:
+'''
+{battle_state}
+'''

@@ -30,7 +30,7 @@ def format_battle_prompt(battle, model):
 
     # Format historical turns
     global historical_turn_2
-    if historical_turn_2:
+    if historical_turn_2 and current_turn > 0:
         prompt_parts.append(f"PREVIOUS TURN ({current_turn - 1}):")
         prompt_parts.append(historical_turn_2)
         prompt_parts.append("")
@@ -112,7 +112,7 @@ def format_battle_prompt(battle, model):
     
     stats = estimate_stats(opponent_active_pokemon)
     if stats:
-        prompt_parts.append(f"Estimated Stats: Attack - {stats['attack']}, Defense - {stats['defense']}, Special Attack - {stats['special-attack']}, Special Defense - {stats['special-defense']}, Speed - {stats['speed']}\n")
+        prompt_parts.append(f"Estimated Stats: Attack - {stats['attack']}, Defense - {stats['defense']}, Special Attack - {stats['special-attack']}, Special Defense - {stats['special-defense']}, Speed - {stats['speed_low']} to {stats['speed_high']}\n")
     
     # Add type analysis sections
     prompt_parts.append("[DEFENSIVE ANALYSIS]")
@@ -243,21 +243,22 @@ def estimate_stats(pokemon) -> dict[str, int]:
         ("defense", pokemon.base_stats["def"]),
         ("special-attack", pokemon.base_stats["spa"]),
         ("special-defense", pokemon.base_stats["spd"]),
-        ("speed", pokemon.base_stats["spe"])
+        ("speed_high", pokemon.base_stats["spe"]),
+        ("speed_low", pokemon.base_stats["spe"])
     ]
     
     # Sort stats by base value to determine likely EV investment
     sorted_stats = sorted(stats_list, key=lambda x: x[1], reverse=True)
     primary_stat = sorted_stats[0][0]
     # Secondary stat is always speed stat to maximize speed control
-    secondary_stat = "speed"
+    secondary_stat = "speed_high"
     
     # Calculate stats
     stats = {}
     for stat_name, base_value in stats_list:
         ev = ev_invested if stat_name in (primary_stat, secondary_stat) else ev_uninvested
         nature = 1.0
-        if stat_name == "speed":
+        if stat_name == "speed_high":
             nature = 1.1 if primary_stat == "speed" else 1.0
         stats[stat_name] = calculate_stat(base_value, level, iv, ev, nature=nature)
     

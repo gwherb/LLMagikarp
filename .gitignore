@@ -49,3 +49,6 @@ upload_cache.json
 
 # Ignore pickle
 token.pickle
+
+# Ignore test files
+test.py

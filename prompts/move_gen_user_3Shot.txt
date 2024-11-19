@@ -1,0 +1,368 @@
+Below are examples of battle states and the resulting rational thoughts. Use the examples to help with your action selection.
+
+Example 1:
+'''
+BATTLE STATE - TURN 14
+============================
+
+PREVIOUS TURN (12):
+Torkoal was switched in at 100% HP. Its Drought ability activated, bringing sunny weather to the battlefield. Typhlosion attempted to use Fire Blast against Torkoal, but the attack missed. The sunny weather condition was maintained during upkeep, and Typhlosion healed 6% HP from its Leftovers item.
+
+LAST TURN (13):
+Typhlosion used Shadow Ball against Torkoal, landing a critical hit and leaving Torkoal at 36% HP. Shadow Ball also lowered Torkoal's Special Defense by one stage. Torkoal then retaliated with Earthquake, which was super effective against Typhlosion, reducing its HP to 31%. The weather effect of Sunny Day is active, and Typhlosion healed to 37% HP from its Leftovers item.
+
+Turn 14 (Current turn):
+OPPONENT STATUS
+--------------
+Remaining Pokemon: 5/6
+
+ACTIVE POKEMON: typhlosionhisui
+HP: 37%
+Status: None
+Ability: Unknown
+Type: FIRE/GHOST
+
+Estimated Stats: Attack - 171.0, Defense - 161.0, Special Attack - 281.0, Special Defense - 172.0, Speed - 120.0 to 241.0
+
+[DEFENSIVE ANALYSIS]
+DEFENSIVE TYPE EFFECTIVENESS FOR typhlosionhisui
+----------------------------------------
+Super Weak (4x):   NONE
+Weak (2x):         WATER, GROUND, ROCK, GHOST, DARK
+Resistant (0.5x):  FIRE, GRASS, ICE, POISON, STEEL, FAIRY
+Very Resistant(0.25x):BUG
+Immune (0x):       NORMAL, FIGHTING
+
+[OFFENSIVE ANALYSIS]
+OFFENSIVE CAPABILITIES OF typhlosionhisui (FIRE/GHOST)
+-------------------------------------------------
+PRIMARY TYPE: FIRE (1.5x STAB)
+Super Effective (2x):   GRASS, ICE, BUG, STEEL
+Not Very Effective (0.5x): FIRE, WATER, ROCK, DRAGON
+No Effect (0x):        NONE
+
+SECONDARY TYPE: GHOST (1.5x STAB)
+Super Effective (2x):   PSYCHIC, GHOST
+Not Very Effective (0.5x): DARK
+No Effect (0x):        NORMAL
+
+YOUR STATUS
+----------
+ACTIVE POKEMON: torkoal
+HP: 36%
+Status: None
+Ability: drought
+Type: FIRE/None
+
+Stats: Attack - 200, Defense - 297, Special Attack - 200, Special Defense - 173, Speed - 85
+
+AVAILABLE MOVES:
+- lavaplume: FIRE | Power: 80 | Category: SPECIAL | Priority: 0 | Effect: [{'chance': 30, 'status': 'brn'}]
+- rapidspin: NORMAL | Power: 50 | Category: PHYSICAL | Priority: 0 | Effect: [{'chance': 100, 'self': {'boosts': {'spe': 1}}}]
+- earthquake: GROUND | Power: 100 | Category: PHYSICAL | Priority: 0 | Effect: []
+- solarbeam: GRASS | Power: 120 | Category: SPECIAL | Priority: 0 | Effect: []
+
+AVAILABLE SWITCHES:
+- dipplin (28% HP) | Status: None | Ability: stickyhold | Type: GRASS/DRAGON | Stats: Attack - 191, Defense - 244, Special Attack - 217, Special Defense - 191, Speed - 121
+  Moves:
+  * recover: NORMAL | Power: 0 | Category: STATUS
+  * gigadrain: GRASS | Power: 75 | Category: SPECIAL
+  * dragonpulse: DRAGON | Power: 85 | Category: SPECIAL
+  * dragontail: DRAGON | Power: 60 | Category: PHYSICAL
+
+- lugia (49% HP) | Status: None | Ability: multiscale | Type: PSYCHIC/FLYING | Stats: Attack - 134, Defense - 229, Special Attack - 172, Special Defense - 264, Speed - 200
+  Moves:
+  * calmmind: PSYCHIC | Power: 0 | Category: STATUS
+  * aeroblast: FLYING | Power: 100 | Category: SPECIAL
+  * recover: NORMAL | Power: 0 | Category: STATUS
+  * earthpower: GROUND | Power: 90 | Category: SPECIAL
+
+- mudsdale (50% HP) | Status: None | Ability: stamina | Type: GROUND/None | Stats: Attack - 258, Defense - 216, Special Attack - 141, Special Defense - 191, Speed - 107
+  Moves:
+  * heavyslam: STEEL | Power: 0 | Category: PHYSICAL
+  * earthquake: GROUND | Power: 100 | Category: PHYSICAL
+  * stoneedge: ROCK | Power: 100 | Category: PHYSICAL
+  * bodypress: FIGHTING | Power: 80 | Category: PHYSICAL
+
+- slowking (100% HP) | Status: None | Ability: regenerator | Type: WATER/PSYCHIC | Stats: Attack - 137, Defense - 191, Special Attack - 226, Special Defense - 244, Speed - 103
+  Moves:
+  * slackoff: NORMAL | Power: 0 | Category: STATUS
+  * chillyreception: ICE | Power: 0 | Category: STATUS
+  * futuresight: PSYCHIC | Power: 120 | Category: SPECIAL
+  * scald: WATER | Power: 80 | Category: SPECIAL
+'''
+
+Response to Example 1:
+'''
+Let me think through this situation step by step:
+
+1. Matchup Analysis:
+- Typhlosion is at 37% HP and at risk for being knocked out.
+- Torkoal has a supereffective move against Typhlosion in earthquake as Typhlosion is weak to GROUND type moves.
+- Typhlosion is able to hit Torkoal with a strong special attack into Torkoal who's special defense is relatively low.
+- Typhlosion outspeeds Torkoal and will move first.
+
+2. Threat Assessment:
+- Typhlosion previously did 64% of Torkoal's HP with a STAB shadow ball critical hit.
+- This means that another shadow ball will likely knock out Torkoal.
+- Typhlosions speed means that it will move first and knock out Torkoal if Torkoal stays in to attack.
+
+3. Available Options:
+- Can stay in and use Earthquake risking a knockout to Torkoal.
+- Let Torkoal faint to allow a safe switch in to a Pokemon that can knock out Typhlosion.
+- Switch into another Pokemon to tank the attack.
+- Switch into another low HP Pokemon to allow a safe switch into a Pokemon that could knock out Typhlosion.
+
+4. Strategic Priority:
+- Switching into dipplin and allowing it to faint will allow the highest speed Pokemon remaining on the team, Lugia, to come in and potentially kill Typhlosion with the supereffective GROUND type move earthpower.
+
+{{"Thought": "Torkoal will likely be knocked out from another attack from Typhlosion. Switching into dipplin, who is at low HP, will likely result in it being knocked out. This will then allow the fastest Pokemon remaining on the team, Lugia, to potentially knock out Typhlosion with a supereffective earthpower.", "action_type": "switch", "action_name": "dipplin"}}
+'''
+
+Example 2:
+'''
+BATTLE STATE - TURN 1
+============================
+
+LAST TURN (0):
+The battle has started. Pelipper was switched in at 100% HP, and Skarmory was also switched in at 100% HP. Pelipper's ability Drizzle activated, setting up Rain Dance weather conditions.
+
+Turn 1 (Current turn):
+OPPONENT STATUS
+--------------
+Remaining Pokemon: 6/6
+
+ACTIVE POKEMON: skarmory
+HP: 100%
+Status: None
+Ability: Unknown
+Type: STEEL/FLYING
+
+Estimated Stats: Attack - 158.0, Defense - 305.0, Special Attack - 94.0, Special Defense - 142.0, Speed - 193.0
+
+[DEFENSIVE ANALYSIS]
+DEFENSIVE TYPE EFFECTIVENESS FOR skarmory
+----------------------------------------
+Super Weak (4x):   NONE
+Weak (2x):         FIRE, ELECTRIC
+Resistant (0.5x):  NORMAL, FLYING, PSYCHIC, DRAGON, STEEL, FAIRY
+Very Resistant(0.25x):GRASS, BUG
+Immune (0x):       POISON, GROUND
+
+[OFFENSIVE ANALYSIS]
+OFFENSIVE CAPABILITIES OF skarmory (STEEL/FLYING)
+-------------------------------------------------
+PRIMARY TYPE: STEEL (1.5x STAB)
+Super Effective (2x):   ICE, ROCK, FAIRY
+Not Very Effective (0.5x): FIRE, WATER, ELECTRIC, STEEL
+No Effect (0x):        NONE
+
+SECONDARY TYPE: FLYING (1.5x STAB)
+Super Effective (2x):   GRASS, FIGHTING, BUG
+Not Very Effective (0.5x): ELECTRIC, ROCK, STEEL
+No Effect (0x):        NONE
+
+YOUR STATUS
+----------
+ACTIVE POKEMON: pelipper
+HP: 100%
+Status: None
+Ability: drizzle
+Type: WATER/FLYING
+
+Stats: Attack - 135, Defense - 221, Special Attack - 213, Special Defense - 170, Speed - 161
+
+AVAILABLE MOVES:
+- knockoff: DARK | Power: 65 | Category: PHYSICAL | Priority: 0 | Effect: []
+- hurricane: FLYING | Power: 110 | Category: SPECIAL | Priority: 0 | Effect: [{'chance': 30, 'volatileStatus': 'confusion'}]
+- roost: FLYING | Power: 0 | Category: STATUS | Priority: 0 | Effect: []
+- hydropump: WATER | Power: 110 | Category: SPECIAL | Priority: 0 | Effect: []
+
+AVAILABLE SWITCHES:
+- oricoriopau (100% HP) | Status: None | Ability: dancer | Type: PSYCHIC/FLYING | Stats: Attack - 126, Defense - 172, Special Attack - 220, Special Defense - 172, Speed - 212
+  Moves:
+  * roost: FLYING | Power: 0 | Category: STATUS
+  * revelationdance: NORMAL | Power: 90 | Category: SPECIAL
+  * hurricane: FLYING | Power: 110 | Category: SPECIAL
+  * quiverdance: BUG | Power: 0 | Category: STATUS
+
+- leafeon (100% HP) | Status: None | Ability: chlorophyll | Type: GRASS/None | Stats: Attack - 244, Defense - 279, Special Attack - 156, Special Defense - 165, Speed - 217
+  Moves:
+  * swordsdance: NORMAL | Power: 0 | Category: STATUS
+  * doubleedge: NORMAL | Power: 120 | Category: PHYSICAL
+  * substitute: NORMAL | Power: 0 | Category: STATUS
+  * leafblade: GRASS | Power: 90 | Category: PHYSICAL
+
+- scizor (100% HP) | Status: None | Ability: technician | Type: BUG/STEEL | Stats: Attack - 251, Defense - 204, Special Attack - 132, Special Defense - 172, Speed - 148
+  Moves:
+  * closecombat: FIGHTING | Power: 120 | Category: PHYSICAL
+  * knockoff: DARK | Power: 65 | Category: PHYSICAL
+  * bulletpunch: STEEL | Power: 40 | Category: PHYSICAL
+  * swordsdance: NORMAL | Power: 0 | Category: STATUS
+
+- lokix (100% HP) | Status: None | Ability: tintedlens | Type: BUG/DARK | Stats: Attack - 214, Defense - 175, Special Attack - 132, Special Defense - 137, Speed - 198
+  Moves:
+  * firstimpression: BUG | Power: 90 | Category: PHYSICAL
+  * suckerpunch: DARK | Power: 70 | Category: PHYSICAL
+  * knockoff: DARK | Power: 65 | Category: PHYSICAL
+  * uturn: BUG | Power: 70 | Category: PHYSICAL
+
+- rhydon (100% HP) | Status: None | Ability: lightningrod | Type: GROUND/ROCK | Stats: Attack - 270, Defense - 253, Special Attack - 125, Special Defense - 125, Speed - 117
+  Moves:
+  * earthquake: GROUND | Power: 100 | Category: PHYSICAL
+  * stoneedge: ROCK | Power: 100 | Category: PHYSICAL
+  * stealthrock: ROCK | Power: 0 | Category: STATUS
+  * megahorn: BUG | Power: 120 | Category: PHYSICAL
+'''
+
+Response to Example 2:
+'''
+Let me think through this situation step by step:
+
+1. Matchup Analysis:
+- Skarmory has high defense but relatively low special defense.
+- Skarmory likely cannot hit Pelipper with any supereffective attacks as a result of its FLYING and STEEL type.
+- Skarmory's low attack and special attack will allow Pelipper to survive most any move that Skarmory could use.
+- Pelipper can take advantage of Skarmory's lower special defense with a neutral STAB hydropump.
+- Hydropump from Pelipper will have its power boosted by the rain.
+
+2. Threat Assessment:
+- Pelipper is at high HP with decent defenses and is likely not going to take much damage from any of Skarmory's attacks.
+- Skarmory's STAB attack types in FLYING and STEEL do not hit Pelipper supereffectively.
+
+3. Available Options:
+- Stay in and attack with Pelipper's hydropump that could deal significant damage.
+- Switch into another Pokemon that could have a better matchup with Skarmory.
+
+4. Strategic Priority:
+- No availble switch on the team has a supereffective attack to deal big damage to Skarmory so switching does not make sense.
+- Pelipper has the potential to deal significant damage which should be captitalized on per the lack of attacking strengths against Skarmory.
+
+{{"Thought": "Switching out has no advanatage here and Pelipper has the potential to do huge damage with a rain boosted WATER type hydropump. This move is neutral against Skarmory and would be a SPECIAL attack going that goes into Skarmory's relatively low special defense.", "action_type": "move", "action_name": "hydropump"}}
+'''
+
+Example 3
+'''
+BATTLE STATE - TURN 10
+============================
+
+PREVIOUS TURN (8):
+Decidueye was switched in at 100% HP but took 12% damage from Stealth Rock. Houndstone then used Body Press against Decidueye, but the attack was ineffective due to Decidueye's immunity.
+
+LAST TURN (9):
+Kleavor was switched in at 36% HP. Decidueye used Poltergeist against Kleavor, resulting in Kleavor fainting. Decidueye took damage from its Life Orb, leaving it at 77% HP. Grumpig was then switched in at 100% HP.
+
+Turn 10 (Current turn):
+OPPONENT STATUS
+--------------
+Remaining Pokemon: 5/6
+
+ACTIVE POKEMON: grumpig
+HP: 100%
+Status: None
+Ability: Unknown
+Type: PSYCHIC/None
+
+Estimated Stats: Attack - 117.0, Defense - 154.0, Special Attack - 200.0, Special Defense - 294.0, Speed - from 134.0 to 239.0
+
+[DEFENSIVE ANALYSIS]
+DEFENSIVE TYPE EFFECTIVENESS FOR grumpig
+----------------------------------------
+Super Weak (4x):   NONE
+Weak (2x):         BUG, GHOST, DARK
+Resistant (0.5x):  FIGHTING, PSYCHIC
+Very Resistant(0.25x):NONE
+Immune (0x):       NONE
+
+[OFFENSIVE ANALYSIS]
+OFFENSIVE CAPABILITIES OF grumpig (PSYCHIC)
+-----------------------------------------
+STAB Bonus: 1.5x damage with PSYCHIC moves
+Super Effective (2x):   FIGHTING, POISON
+Not Very Effective (0.5x): PSYCHIC, STEEL
+No Effect (0x):        DARK
+
+YOUR STATUS
+----------
+ACTIVE POKEMON: decidueye
+HP: 78%
+Status: None
+Ability: overgrow
+Type: GRASS/GHOST
+
+Stats: Attack - 239, Defense - 182, Special Attack - 226, Special Defense - 226, Speed - 173
+
+AVAILABLE MOVES:
+- swordsdance: NORMAL | Power: 0 | Category: STATUS | Priority: 0 | Effect: []
+- poltergeist: GHOST | Power: 110 | Category: PHYSICAL | Priority: 0 | Effect: []
+- shadowsneak: GHOST | Power: 40 | Category: PHYSICAL | Priority: 1 | Effect: []
+- leafblade: GRASS | Power: 90 | Category: PHYSICAL | Priority: 0 | Effect: []
+
+AVAILABLE SWITCHES:
+- tauros (26% HP) | Status: None | Ability: sheerforce | Type: NORMAL/None | Stats: Attack - 211, Defense - 203, Special Attack - 113, Special Defense - 162, Speed - 228
+  Moves:
+  * throatchop: DARK | Power: 80 | Category: PHYSICAL
+  * earthquake: GROUND | Power: 100 | Category: PHYSICAL
+  * bodyslam: NORMAL | Power: 85 | Category: PHYSICAL
+  * closecombat: FIGHTING | Power: 120 | Category: PHYSICAL
+
+- sylveon (35% HP) | Status: None | Ability: pixilate | Type: FAIRY/None | Stats: Attack - 115, Defense - 159, Special Attack - 236, Special Defense - 270, Speed - 151
+  Moves:
+  * wish: NORMAL | Power: 0 | Category: STATUS
+  * protect: NORMAL | Power: 0 | Category: STATUS
+  * calmmind: PSYCHIC | Power: 0 | Category: STATUS
+  * hypervoice: NORMAL | Power: 90 | Category: SPECIAL
+
+- blissey (30% HP) | Status: None | Ability: naturalcure | Type: NORMAL/None | Stats: Attack - 21, Defense - 65, Special Attack - 174, Special Defense - 275, Speed - 141
+  Moves:
+  * thunderwave: ELECTRIC | Power: 0 | Category: STATUS
+  * softboiled: NORMAL | Power: 0 | Category: STATUS
+  * healbell: NORMAL | Power: 0 | Category: STATUS
+  * seismictoss: FIGHTING | Power: 0 | Category: PHYSICAL
+
+- typhlosionhisui (100% HP) | Status: None | Ability: blaze | Type: FIRE/GHOST | Stats: Attack - 144, Defense - 177, Special Attack - 245, Special Defense - 189, Speed - 205
+  Moves:
+  * calmmind: PSYCHIC | Power: 0 | Category: STATUS
+  * shadowball: GHOST | Power: 80 | Category: SPECIAL
+  * substitute: NORMAL | Power: 0 | Category: STATUS
+  * fireblast: FIRE | Power: 110 | Category: SPECIAL
+
+- masquerain (100% HP) | Status: None | Ability: intimidate | Type: BUG/FLYING | Stats: Attack - 109, Defense - 158, Special Attack - 224, Special Defense - 192, Speed - 189
+  Moves:
+  * hurricane: FLYING | Power: 110 | Category: SPECIAL
+  * hydropump: WATER | Power: 110 | Category: SPECIAL
+  * stickyweb: BUG | Power: 0 | Category: STATUS
+  * stunspore: GRASS | Power: 0 | Category: STATUS
+'''
+
+Response to Example 3:
+'''
+Let me think through this situation step by step:
+
+1. Matchup Analysis:
+- Because Grumpig was switched into an unfavorable type matchup, it likely means that it has means of knocking out Decidueye.
+- Decidueye has the potential to outspeed Grumpig if it is not invested fully into speed.
+- Decidueye has the potential to deal huge damage to Grumpig with a supereffective move poltergeist as Grumpig is weak to GHOST type moves.
+
+2. Threat Assessment:
+- Grumpig likely has a move to threaten Decidueye.
+- If Decidueye cannot outspeed Grumpig, it will likely faint.
+- Available switches that have a favorable matchup such as Sylveon or Blissey because of its high special defense are at low HP and will likely be knocked out from an incoming attack.
+
+3. Available Options:
+- Stay in and potentially do huge damge with Decidueye's poltergeist.
+- Stay in allowing Decidueye to be knocked out to safely bring in a favorable matchup such as Typhlosion who can attack with supereffective GHOST type attacks.
+- Switch into a low HP Pokemon to allow for a safe switch in to a favorable matchup.
+
+4. Strategic Priority:
+- Damage to other Pokemon should be minimized. It appears the risk of Decidueye outspeeding and getting a strong poltergeist move off is worth. If Decidueye faints, then a fast Pokemon such as Typhlosion or Tauros can be swapped in to revenge attack Grumpig.
+
+{{"Thought": "Decidueye has the potential to deal huge damage to the opposing Grumpig with a supereffective GHOST type attack. If Decidueye faints, a fast availble switch can be put in so prioritizing damage is worth the risk.", "action_type": "move", "action_name": "poltergeist"}}
+'''
+
+Below is the current battle state. Analyze it and provide strategic reasoning for your recommended action.
+Remember, to consider that switching is important to create favorable matchups, but switching too much can create a scenario where you are consistently taking damage without dealing any in return.
+Battle state:
+'''
+{battle_state}
+'''

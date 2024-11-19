@@ -7,7 +7,7 @@ from .utils import load_prompt
 def move_prompt(battle_state, model):
     
     system_message = load_prompt("move_gen_system.txt")
-    user_message = load_prompt("move_gen_user.txt")
+    user_message = load_prompt("move_gen_user_0shot.txt")
 
     user_message = user_message.format(battle_state=battle_state)
 
