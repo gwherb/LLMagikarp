@@ -12,6 +12,7 @@ class LoggingPlayer(Player):
         self._game_started = False
         self._current_battle = None
         self.LLM_model = model
+        self.name = "LoggingPlayer"
 
     async def battle_against(self, opponent, n_battles=1):
         """Override battle_against to add logging for local battles."""
@@ -65,7 +66,7 @@ class LoggingPlayer(Player):
             # Start new battle log before searching for game
             if not self._game_started:
                 self._battle_logger = BattleLogger()
-                self._battle_logger.start_new_game("ladder", self.LLM_model)
+                self._battle_logger.start_new_game("ladder", self.LLM_model, self.name)
                 self._game_started = True
                 ic(f"Starting ladder game {completed_games + 1}/{n_games}")
 

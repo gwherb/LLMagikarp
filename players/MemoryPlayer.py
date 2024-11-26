@@ -6,6 +6,7 @@ class MemoryPlayer(LoggingPlayer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.last_thought = None
+        self.name = "MemoryPlayer"
 
     def choose_move(self, battle):
             # Get battle state and decision

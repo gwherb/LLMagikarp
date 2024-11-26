@@ -7,6 +7,7 @@ class SC3Player(LoggingPlayer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.LLM_model = 'gpt-4o'
+        self.name = "SC3Player"
 
     def choose_move(self, battle):
         """Override choose_move to add logging for each turn."""

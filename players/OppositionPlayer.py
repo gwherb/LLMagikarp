@@ -3,6 +3,9 @@ from prompts import *
 from players import LoggingPlayer
 
 class OppositionPlayer(LoggingPlayer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.name = "OppositionPlayer"
 
     def choose_move(self, battle):
             # Get battle state and decision

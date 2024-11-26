@@ -6,6 +6,7 @@ class InitialStrategyPlayer(LoggingPlayer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.strategy = None
+        self.name = "InitialStrategyPlayer"
 
     def choose_move(self, battle):
 

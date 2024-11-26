@@ -7,7 +7,7 @@ import argparse
 async def local(n_battles=1, model=None):
 
     # Create Player 1
-    LLMagikarp = MemoryPlayer(model=model)
+    LLMagikarp = OppositionPlayer(model=model)
 
     # Create Player 2
     HeuristicsPlayer = SimpleHeuristicsPlayer()

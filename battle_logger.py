@@ -13,7 +13,7 @@ class BattleLogger:
         self.current_game_data = None
         self.model_name = None
 
-    def start_new_game(self, game_type, model_name):
+    def start_new_game(self, game_type, model_name, player_name):
         """
         Start logging a new game.
         
@@ -35,6 +35,7 @@ class BattleLogger:
                 "outcome": None,
                 "final_rank": None if game_type != "ladder" else 0,
                 "llm_model": self.model_name,
+                "player_name": player_name,
                 "random_move_count": 0,
                 "total_move_count": 0
             },
