@@ -2,17 +2,25 @@ from icecream import ic
 from prompts import *
 from players import LoggingPlayer
 
-class MemoryPlayer(LoggingPlayer):
+class InitialStrategyPlayer(LoggingPlayer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.last_thought = None
+        self.strategy = None
 
     def choose_move(self, battle):
+
             # Get battle state and decision
-            battle_state = memory_battle_state(battle, self.LLM_model, thought=self.last_thought)
+            battle_state = opposition_state_gen(battle, self.LLM_model)
+
+            # On first turn, get an initial strategy
+            if battle.turn == 0:
+                self.strategy = get_strategy(battle_state, model='gpt-4o')
+
+            # Insert strategy into battle state
+            battle_state = battle_state.replace("YOUR STATUS\n----------", f"YOUR STATUS\n----------\nSTRATEGY\n{self.strategy}\n\n")
+
             # ic(battle_state) # Debugging
-            thought, action_type, action_name = move_prompt(battle_state, self.LLM_model, mode="memory")
-            self.last_thought = thought
+            thought, action_type, action_name = move_prompt(battle_state, self.LLM_model)
 
             # Log the turn
             if self._game_started:  # Only log if game is properly started

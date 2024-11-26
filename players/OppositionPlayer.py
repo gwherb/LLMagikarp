@@ -2,17 +2,13 @@ from icecream import ic
 from prompts import *
 from players import LoggingPlayer
 
-class MemoryPlayer(LoggingPlayer):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.last_thought = None
+class OppositionPlayer(LoggingPlayer):
 
     def choose_move(self, battle):
             # Get battle state and decision
-            battle_state = memory_battle_state(battle, self.LLM_model, thought=self.last_thought)
+            battle_state = opposition_state_gen(battle, self.LLM_model)
             # ic(battle_state) # Debugging
-            thought, action_type, action_name = move_prompt(battle_state, self.LLM_model, mode="memory")
-            self.last_thought = thought
+            thought, action_type, action_name = move_prompt(battle_state, self.LLM_model, mode="opposition")
 
             # Log the turn
             if self._game_started:  # Only log if game is properly started

@@ -1,0 +1,9 @@
+"Analyze the Pokemon team below and identify key roles and strategies for each member.
+Consider strengths in stats, typing, and movesets to determine optimal utility (e.g., physical wallbreaker, special wall, setup sweeper).
+
+Team Description:
+'''
+{team_description}
+'''
+
+Generate roles and strategic notes for each Pokemon:

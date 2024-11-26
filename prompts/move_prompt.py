@@ -10,6 +10,9 @@ def move_prompt(battle_state, model, mode=None):
 
     if mode == "memory":
         user_message = load_prompt("memory_move_gen.txt")
+    elif mode == "opposition":
+        user_message = load_prompt("opposition_move_prompt.txt")
+        system_message = load_prompt("opposition_system.txt")
     else:
         user_message = load_prompt("move_gen_user_3shot.txt")
 
