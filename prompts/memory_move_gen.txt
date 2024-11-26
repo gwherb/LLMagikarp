@@ -5,12 +5,18 @@ Example 1:
 BATTLE STATE - TURN 14
 ============================
 
+PREVIOUS THOUGHTS (12):
+Mudsdale is at 50% HP and facing a Typhlosion that is resistant to our Fighting and Steel moves. Since Mudsdale's Earthquake is also not very effective against Typhlosion, switching out is necessary to maintain offensive pressure. Offers in options include switching to either Torkoal or Slowking, both at full HP. Torkoal can resist Typhlosion's Fire-type moves effectively and threatens back with Lava Plume. Slowking does not offer strong offensive potential against Typhlosion either. Therefore, switching to Torkoal grants us the best matchup to maintain momentum and make the first strike.
+
 PREVIOUS TURN (12):
 Torkoal was switched in at 100% HP. Its Drought ability activated, bringing sunny weather to the battlefield. Typhlosion attempted to use Fire Blast against Torkoal, but the attack missed. The sunny weather condition was maintained during upkeep, and Typhlosion healed 6% HP from its Leftovers item.
 
+LAST THOUGHTS (13):
+Torkoal is in an advantageous position against Typhlosion, who is at 92% HP. Typhlosion's Fire-type attacks are resisted by Torkoal's Fire typing, leaving it more vulnerable to Ground and Water moves. Given Torkoal has access to Earthquake, which is super effective (2x) against Typhlosion's Fire typing, this is a strong play to maximize damage. Earthquake offers 100 base power and can lead to a favorable trade here, as Typhlosion is also at risk of a 2x hit since it does not resist Ground. Additionally, Typhlosion\u2019s attack options are limited under current health conditions and it is unlikely to threaten Torkoal with a significant move due to its resistance. Thus, using Earthquake ensures that we maintain offensive pressure rather than switching out and giving Typhlosion a free turn.
+
 LAST TURN (13):
 Typhlosion used Shadow Ball against Torkoal, landing a critical hit and leaving Torkoal at 36% HP. Shadow Ball also lowered Torkoal's Special Defense by one stage. Torkoal then retaliated with Earthquake, which was super effective against Typhlosion, reducing its HP to 31%. The weather effect of Sunny Day is active, and Typhlosion healed to 37% HP from its Leftovers item.
-
+ 
 Turn 14 (Current turn):
 OPPONENT STATUS
 --------------
@@ -246,8 +252,14 @@ Example 3
 BATTLE STATE - TURN 10
 ============================
 
+PREVIOUS THOUGHTS (8):
+Blissey is at 30% HP and currently being threatened by Houndstone's Body Press, which deals super-effective damage (2x damage). Houndstone's Poltergeist has no effect against Blissey due to its Normal typing. However, with Blissey's HP at a critical level, it's important to switch to a more viable Pok\u00e9mon. The best switch option is Decidueye, which is at 100% HP and can use Poltergeist (110 base power) effectively against Houndstone. Since Houndstone is at 40% HP, this will allow Decidueye to take a hit and potentially knock out Houndstone before it can retaliate, as it is weak against Ghost-type attacks. Thus, switching to Decidueye is the most strategic move in order to preserve the momentum and to capitalize on the attack potential while mitigating damage to Blissey.
+
 PREVIOUS TURN (8):
 Decidueye was switched in at 100% HP but took 12% damage from Stealth Rock. Houndstone then used Body Press against Decidueye, but the attack was ineffective due to Decidueye's immunity.
+
+LAST THOUGHTS (9):
+In this situation, Decidueye is in a good position against Houndstone due to its Ghost typing, which Houndstone cannot hit effectively. Additionally, Decidueye has a strong move in Poltergeist, which is super effective against Houndstone's Ghost-type. With Houndstone at 40% HP and unable to threaten Decidueye, using Poltergeist to deal significant damage is the best play. There is also no need to switch given the current advantageous position.
 
 LAST TURN (9):
 Kleavor was switched in at 36% HP. Decidueye used Poltergeist against Kleavor, resulting in Kleavor fainting. Decidueye took damage from its Life Orb, leaving it at 77% HP. Grumpig was then switched in at 100% HP.

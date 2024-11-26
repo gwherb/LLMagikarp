@@ -44,7 +44,7 @@ class BattleLogger:
         self.current_game_file = game_dir / "battle_log.json"
         self._save_current_game()
 
-    def log_turn(self, turn_number, battle_state, thought, action_type, action_name, is_random=False):
+    def log_turn(self, turn_number, battle_state, thought, action_type, action_name, is_random=False, consensus=None, voting=None):
         """
         Log a single turn of the battle.
         
@@ -66,7 +66,9 @@ class BattleLogger:
             "action_type": action_type,
             "action_name": action_name,
             "is_random_move": is_random,
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
+            "consensus": consensus,
+            "voting": voting
         }
         
         # Update metadata counters

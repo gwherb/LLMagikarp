@@ -6,12 +6,12 @@ from battle_logger import BattleLogger
 from time import perf_counter
 
 class LoggingPlayer(Player):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, model='gpt-4o-mini', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._battle_logger = BattleLogger()
         self._game_started = False
         self._current_battle = None
-        self.LLM_model = 'gpt-4o-mini'
+        self.LLM_model = model
 
     async def battle_against(self, opponent, n_battles=1):
         """Override battle_against to add logging for local battles."""

@@ -4,10 +4,14 @@ from icecream import ic
 import json
 from .utils import load_prompt
 
-def move_prompt(battle_state, model):
+def move_prompt(battle_state, model, mode=None):
     
     system_message = load_prompt("move_gen_system.txt")
-    user_message = load_prompt("move_gen_user_0shot.txt")
+
+    if mode == "memory":
+        user_message = load_prompt("memory_move_gen.txt")
+    else:
+        user_message = load_prompt("move_gen_user_3shot.txt")
 
     user_message = user_message.format(battle_state=battle_state)
 

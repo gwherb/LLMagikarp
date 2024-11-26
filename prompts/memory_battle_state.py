@@ -3,8 +3,9 @@ from .utils import *
 from .type_effectiveness import *
 
 historical_turn_2 = None
+past_thought_2 = None
 
-def format_battle_prompt(battle, model):
+def memory_battle_state(battle, model, thought=None):
     """
     Format battle observations into a structured prompt for decision making.
     
@@ -37,7 +38,19 @@ def format_battle_prompt(battle, model):
     prompt_parts.append(historical_turn_1)
     prompt_parts.append("")
     historical_turn_2 = historical_turn_1
-    
+
+    # Add the thought from the last turn
+    global past_thought_2
+    if past_thought_2 and current_turn > 0:
+        prompt_parts.append(f"PREVIOUS THOUGHTS ({current_turn - 1}):")
+        prompt_parts.append(past_thought_2)
+        prompt_parts.append("")
+    if thought:
+        past_thought_1 = thought
+        prompt_parts.append(f"LAST THOUGHTS ({current_turn}):")
+        prompt_parts.append(past_thought_1)
+        prompt_parts.append("")
+        past_thought_2 = past_thought_1
     
     # Current turn information
     prompt_parts.append(f"Turn {current_turn + 1} (Current turn):")
@@ -168,35 +181,3 @@ def format_battle_prompt(battle, model):
         prompt_parts.append("AVAILABLE SWITCHES: None\n")
 
     return "\n".join(prompt_parts)
-
-def test_historic_prompt():
-    # Test the function
-    events=[['',
-            'move',
-            'p2a: Kleavor',
-            'Close Combat',
-            'p1a: Swalot'],
-            ['', '-resisted', 'p1a: Swalot'],
-            ['', '-damage', 'p1a: Swalot', '58/100'],
-            ['', '-unboost', 'p2a: Kleavor', 'def', '1'],
-            ['', '-unboost', 'p2a: Kleavor', 'spd', '1'],
-            ['',
-            'move',
-            'p1a: Swalot',
-            'Earthquake',
-            'p2a: Kleavor'],
-            ['', '-damage', 'p2a: Kleavor', '127/237'],
-            ['',
-            '-heal',
-            'p1a: Swalot',
-            '64/100',
-            '[from] item: Leftovers'],
-            ['', 'upkeep'],
-            ['', 'turn', '15']]
-    # ic(get_last_turn_observation(events))  # Should return a natural language summary
-
-if __name__ == "__main__":
-    test_historic_prompt()
-    # Test the function
-    # from poke_env.player.random_player import RandomPlayer
-    # random_player = RandomPlayer()
