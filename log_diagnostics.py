@@ -21,22 +21,52 @@ class LogDiagnostics:
         self.local_data = None
         
     def authenticate(self):
+        """Authenticate with Google Drive API with improved token handling"""
+        # Try to load existing token
         if os.path.exists('token.pickle'):
-            with open('token.pickle', 'rb') as token:
-                self.creds = pickle.load(token)
+            try:
+                with open('token.pickle', 'rb') as token:
+                    self.creds = pickle.load(token)
+                
+                # Test if token is valid
+                if self.creds and self.creds.valid:
+                    return build('drive', 'v3', credentials=self.creds)
+                
+                # Try refreshing expired token
+                if self.creds and self.creds.expired and self.creds.refresh_token:
+                    try:
+                        self.creds.refresh(Request())
+                        return build('drive', 'v3', credentials=self.creds)
+                    except Exception as e:
+                        print(f"Token refresh failed: {e}")
+                        # Token refresh failed, delete the invalid token
+                        os.remove('token.pickle')
+                        self.creds = None
+            except Exception as e:
+                print(f"Error loading token: {e}")
+                os.remove('token.pickle')
+                self.creds = None
         
-        if not self.creds or not self.creds.valid:
-            if self.creds and self.creds.expired and self.creds.refresh_token:
-                self.creds.refresh(Request())
-            else:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    'credentials.json', self.SCOPES)
-                self.creds = flow.run_local_server(port=8080)
+        # If we get here, we need new credentials
+        try:
+            print("Initiating new authentication flow...")
+            if not os.path.exists('credentials.json'):
+                raise FileNotFoundError(
+                    "credentials.json not found. Please download it from Google Cloud Console"
+                )
+                
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', self.SCOPES)
+            self.creds = flow.run_local_server(port=8080)
             
+            # Save the new token
             with open('token.pickle', 'wb') as token:
                 pickle.dump(self.creds, token)
-        
-        return build('drive', 'v3', credentials=self.creds)
+                
+            return build('drive', 'v3', credentials=self.creds)
+            
+        except Exception as e:
+            raise Exception(f"Authentication failed: {e}")
 
     def _load_cache(self):
         try:
