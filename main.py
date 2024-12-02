@@ -7,7 +7,7 @@ import argparse
 async def local(n_battles=1, model=None):
 
     # Create Player 1
-    LLMagikarp = OppositionPlayer(model=model)
+    LLMagikarp = MemoryPlayer(model=model)
 
     # Create Player 2
     HeuristicsPlayer = SimpleHeuristicsPlayer()
@@ -27,7 +27,7 @@ async def server(n_challenges=1, model=None):
 
 async def ladder(n_battles=1, model=None):
 
-    LLMagikarp = MemoryPlayer(
+    LLMagikarp = SC3Player(
         account_configuration=AccountConfiguration("gwherb", "Just4Gh!"),
         server_configuration=ShowdownServerConfiguration,
         start_timer_on_battle_start=True,

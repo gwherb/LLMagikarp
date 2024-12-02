@@ -34,7 +34,10 @@ def rectify_log_metadata():
     
     # Define date ranges for processing
     date_ranges = [
-        ("20241030_132023", "20241030_132024", "LoggingPlayer"),
+        ("20241030_000000", "20241124_160000", "LoggingPlayer"),
+        ("20241124_160000", "20241125_160000", "SC3Player"),
+        ("20241125_160000", "20241125_230000", "MemoryPlayer"),
+        ("20241125_230000", "20241126_100200", "OppositionPlayer"),
     ]
 
     # Process each date range

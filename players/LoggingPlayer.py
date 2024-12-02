@@ -27,7 +27,7 @@ class LoggingPlayer(Player):
             # Start new battle log
             if not self._game_started:
                 self._battle_logger = BattleLogger()  # Create new logger for each battle
-                self._battle_logger.start_new_game("local", self.LLM_model)
+                self._battle_logger.start_new_game("local", self.LLM_model, self.name)
                 self._game_started = True
             
             # Run single battle

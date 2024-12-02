@@ -7,3 +7,4 @@ Focus on:
 - Win conditions: How each Pokemon contributes to securing victories
 
 Keep analysis concise and battle-focused. Use competitive Pokemon terminology. Each Pokemon's strategy should be 2-3 sentences maximum, highlighting only the most important tactical considerations.
+This strategy should be an overarching strategy for the entire game. Not just one turn. 

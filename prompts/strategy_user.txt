@@ -1,6 +1,109 @@
 "Analyze the Pokemon team below and identify key roles and strategies for each member.
 Consider strengths in stats, typing, and movesets to determine optimal utility (e.g., physical wallbreaker, special wall, setup sweeper).
 
+Use this example for guidance:
+
+Example Team Description:
+'''
+ACTIVE POKEMON: decidueye
+HP: 78%
+Status: None
+Ability: overgrow
+Type: GRASS/GHOST
+
+Stats: Attack - 239, Defense - 182, Special Attack - 226, Special Defense - 226, Speed - 173
+
+AVAILABLE MOVES:
+- swordsdance: NORMAL | Power: 0 | Category: STATUS | Priority: 0 | Effect: []
+- poltergeist: GHOST | Power: 110 | Category: PHYSICAL | Priority: 0 | Effect: []
+- shadowsneak: GHOST | Power: 40 | Category: PHYSICAL | Priority: 1 | Effect: []
+- leafblade: GRASS | Power: 90 | Category: PHYSICAL | Priority: 0 | Effect: []
+
+AVAILABLE SWITCHES:
+- tauros (26% HP) | Status: None | Ability: sheerforce | Type: NORMAL/None | Stats: Attack - 211, Defense - 203, Special Attack - 113, Special Defense - 162, Speed - 228
+  Moves:
+  * throatchop: DARK | Power: 80 | Category: PHYSICAL
+  * earthquake: GROUND | Power: 100 | Category: PHYSICAL
+  * bodyslam: NORMAL | Power: 85 | Category: PHYSICAL
+  * closecombat: FIGHTING | Power: 120 | Category: PHYSICAL
+
+- sylveon (35% HP) | Status: None | Ability: pixilate | Type: FAIRY/None | Stats: Attack - 115, Defense - 159, Special Attack - 236, Special Defense - 270, Speed - 151
+  Moves:
+  * wish: NORMAL | Power: 0 | Category: STATUS
+  * protect: NORMAL | Power: 0 | Category: STATUS
+  * calmmind: PSYCHIC | Power: 0 | Category: STATUS
+  * hypervoice: NORMAL | Power: 90 | Category: SPECIAL
+
+- blissey (30% HP) | Status: None | Ability: naturalcure | Type: NORMAL/None | Stats: Attack - 21, Defense - 65, Special Attack - 174, Special Defense - 275, Speed - 141
+  Moves:
+  * thunderwave: ELECTRIC | Power: 0 | Category: STATUS
+  * softboiled: NORMAL | Power: 0 | Category: STATUS
+  * healbell: NORMAL | Power: 0 | Category: STATUS
+  * seismictoss: FIGHTING | Power: 0 | Category: PHYSICAL
+
+- typhlosionhisui (100% HP) | Status: None | Ability: blaze | Type: FIRE/GHOST | Stats: Attack - 144, Defense - 177, Special Attack - 245, Special Defense - 189, Speed - 205
+  Moves:
+  * calmmind: PSYCHIC | Power: 0 | Category: STATUS
+  * shadowball: GHOST | Power: 80 | Category: SPECIAL
+  * substitute: NORMAL | Power: 0 | Category: STATUS
+  * fireblast: FIRE | Power: 110 | Category: SPECIAL
+
+- masquerain (100% HP) | Status: None | Ability: intimidate | Type: BUG/FLYING | Stats: Attack - 109, Defense - 158, Special Attack - 224, Special Defense - 192, Speed - 189
+  Moves:
+  * hurricane: FLYING | Power: 110 | Category: SPECIAL
+  * hydropump: WATER | Power: 110 | Category: SPECIAL
+  * stickyweb: BUG | Power: 0 | Category: STATUS
+  * stunspore: GRASS | Power: 0 | Category: STATUS
+'''
+
+Response to Example 1:
+'''
+# Team Strategy Analysis
+
+## Core Team Identity
+This team operates as a balanced offense composition with strong setup potential and defensive utility. The strategy centers around controlling speed through Sticky Web and Thunder Wave while leveraging both physical and special setup sweepers, backed by strong defensive presence.
+
+## Key Pokemon Roles
+
+### Decidueye (Physical Setup Sweeper)
+Primary sweeper with Sword Dance setup potential and priority in Shadow Sneak. Strong STAB combination in Ghost/Grass allows coverage against common defensive types.
+
+### Sylveon (Special Wall/Wish Support)
+Provides team support through Wish passing while threatening with Pixilate-boosted Hyper Voice. Calm Mind sets allow it to function as a secondary special sweeper.
+
+### Blissey (Defensive Utility/Cleric)
+Massive special wall providing team support through Heal Bell and Soft-Boiled. Thunder Wave offers speed control while Seismic Toss provides consistent damage output.
+
+### Hisuian Typhlosion (Special Sweeper)
+Secondary Ghost-type attacker focusing on special moves. Calm Mind setup potential behind Substitute makes it a strong late-game win condition.
+
+### Masquerain (Hazard Setter/Speed Control)
+Crucial role in setting Sticky Web for team speed control. Offers additional utility through Stun Spore while maintaining offensive presence with Hurricane and Hydro Pump.
+
+### Tauros (Physical Breaker)
+Sheer Force-boosted moves provide raw breaking power. Close Combat handles Steel-types while Throat Chop prevents sound-based moves.
+
+## Win Conditions
+1. Primary: Decidueye sweep after Sword Dance setup with speed control
+2. Secondary: Typhlosion Calm Mind sweep behind Substitute
+3. Tertiary: Sylveon special sweep after Calm Mind
+
+## Strategic Guidelines
+1. Establish speed control early through Sticky Web/Thunder Wave
+2. Maintain healing support through Wish/Soft-Boiled
+3. Use Heal Bell to keep setup sweepers healthy
+4. Create setup opportunities through status moves and substitutes
+5. Leverage Ghost-type synergy between Decidueye and Typhlosion
+6. Control threatening special attackers with Blissey
+
+## Team Weaknesses to Consider
+- Susceptible to Rapid Spin/Defog removing Sticky Web
+- Limited Ground-type resistance
+- Can struggle against strong Dark-type attackers
+- Relies heavily on setup moves
+'''
+
+
 Team Description:
 '''
 {team_description}

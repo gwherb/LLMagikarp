@@ -3,6 +3,7 @@ from .LoggingPlayer import LoggingPlayer
 from .SC3Player import SC3Player
 from .MemoryPlayer import MemoryPlayer
 from .OppositionPlayer import OppositionPlayer
+from .InitialStrategyPlayer import InitialStrategyPlayer
 
 # Import other player classes here
 # from .AnotherPlayer import AnotherPlayer
@@ -13,4 +14,4 @@ from .OppositionPlayer import OppositionPlayer
 
 # If you want to control what gets imported when someone does `from players import *`,
 # you can define __all__:
-__all__ = ['TestPlayer', 'LoggingPlayer', 'SC3Player', 'MemoryPlayer', 'OppositionPlayer']  # Add other player names to this list as needed
+__all__ = ['TestPlayer', 'LoggingPlayer', 'SC3Player', 'MemoryPlayer', 'OppositionPlayer', 'InitialStrategyPlayer']  # Add other player names to this list as needed

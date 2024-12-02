@@ -44,11 +44,23 @@ logs/
 # Remove Google API credentials
 credentials.json
 
-# Remove the cache
+# Remove the cache and logging files
 upload_cache.json
+upload_log.py
+rectify_log_metadata.py
+download_logs.py
+ranking_progression.html
+
+# Ignore stats files
+pokemon_battle_stats.csv
+pokemon_ranking_data.csv
+pokemon-stats-viz.ipynb
 
 # Ignore pickle
 token.pickle
 
 # Ignore test files
 test.py
+
+# Ignore images
+Documentation/Images

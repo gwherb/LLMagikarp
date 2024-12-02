@@ -13,8 +13,8 @@ class InitialStrategyPlayer(LoggingPlayer):
             # Get battle state and decision
             battle_state = opposition_state_gen(battle, self.LLM_model)
 
-            # On first turn, get an initial strategy
-            if battle.turn == 0:
+            # On first turn,t an initial strategy
+            if battle.turn == 1:
                 self.strategy = get_strategy(battle_state, model='gpt-4o')
 
             # Insert strategy into battle state

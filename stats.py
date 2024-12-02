@@ -4,13 +4,13 @@ from icecream import ic
 from datetime import datetime
 import argparse
 import re
+import csv
 
 def get_battle_logs(logs_dir="./logs", start_date=None, end_date=None):
     logs_path = Path(logs_dir)
     
     for log_file in logs_path.glob("**/battle_log.json"):
         try:
-            # Get timestamp from the log file's parent directory
             timestamp_str = log_file.parent.name
             timestamp = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
 
@@ -28,74 +28,102 @@ def get_battle_logs(logs_dir="./logs", start_date=None, end_date=None):
             ic(f"Error processing {log_file}: {e}")
             continue
 
-def get_stats(stats_dict, game_type, start_date, end_date, model=None):
+def get_stats(stats_dict, game_type, start_date, end_date, model=None, player=None):
     for battle_log in get_battle_logs(start_date=start_date, end_date=end_date):
-        # Skip if this battle log isn't for the game type we're currently processing
-        if battle_log["metadata"]["game_type"] != game_type:
-            continue
+        try:
+            if battle_log["metadata"]["game_type"] != game_type:
+                continue
 
-        if model and battle_log["metadata"]["llm_model"] != model:
-            continue
+            if model and battle_log["metadata"]["llm_model"] != model:
+                continue
 
-        prev_switch = False
-        turns = []  # List to store the turns of the match
+            if player and battle_log["metadata"]["player_name"] != player:
+                continue
 
-        stats_dict["games_played"] += 1
-        stats_dict['total_random_moves'] += battle_log["metadata"]["random_move_count"]
-        
-        if battle_log["metadata"]["outcome"] == "win":
-            stats_dict["wins"] += 1
-        elif battle_log["metadata"]["outcome"] == "loss":
-            stats_dict["losses"] += 1
-            last_turn_state = battle_log["turns"][-1]["battle_state"]
-            remaining_pokemon = re.search('Remaining Pokemon: (\d)/', last_turn_state)
-            if remaining_pokemon and int(remaining_pokemon.group(1)) <= 2:
-                stats_dict["close_losses"] += 1
-            elif remaining_pokemon and int(remaining_pokemon.group(1)) >= 5:
-                stats_dict["total_defeats"] += 1
-        else:
-            stats_dict["error_matches"] += 1
+            if player:
+                start_date = "20241030_000000"
+                end_date = "20250101_000000"
 
-        sc3_turns = 0
-        consensus_turns = 0
-        for turn in battle_log["turns"]:
-            if turn["action_type"] == "switch":
-                if prev_switch:
-                    stats_dict["double_switches"] += 1
-                prev_switch = True
+            prev_switch = False
+            turns = []
 
-                stats_dict["total_switches"] += 1
-                turns.append(0)
-
-            elif turn["action_type"] == "move":
-                stats_dict["total_attacks"] += 1
-                prev_switch = False
-                turns.append(1)
+            stats_dict["games_played"] += 1
+            stats_dict['total_random_moves'] += battle_log["metadata"].get("random_move_count", 0)
             
-            if "consensus" in turn:
-                stats_dict["sc3_turns"] += 1
-                if turn["consensus"]:
-                    stats_dict["sc3_consensus_turns"] += 1
+            if battle_log["metadata"]["outcome"] == "win":
+                stats_dict["wins"] += 1
+            elif battle_log["metadata"]["outcome"] == "loss":
+                stats_dict["losses"] += 1
+                # Check if turns exist and there's at least one turn
+                if battle_log.get("turns") and len(battle_log["turns"]) > 0:
+                    last_turn_state = battle_log["turns"][-1].get("battle_state", "")
+                    remaining_pokemon = re.search('Remaining Pokemon: (\d)/', last_turn_state)
+                    if remaining_pokemon and int(remaining_pokemon.group(1)) <= 2:
+                        stats_dict["close_losses"] += 1
+                    elif remaining_pokemon and int(remaining_pokemon.group(1)) >= 5:
+                        stats_dict["total_defeats"] += 1
+            else:
+                stats_dict["error_matches"] += 1
 
-        total_turns = len(turns)
-        stats_dict["avg_turns"] += total_turns
+            if not battle_log.get("turns"):
+                continue
 
-        stats_dict["avg_late_game_switches"] += sum(turns[round(total_turns * 0.75):])
+            for turn in battle_log["turns"]:
+                if turn.get("action_type") == "switch":
+                    if prev_switch:
+                        stats_dict["double_switches"] += 1
+                    prev_switch = True
+                    stats_dict["total_switches"] += 1
+                    turns.append(0)
+                elif turn.get("action_type") == "move":
+                    stats_dict["total_attacks"] += 1
+                    prev_switch = False
+                    turns.append(1)
+                
+                if "consensus" in turn:
+                    stats_dict["sc3_turns"] += 1
+                    if turn["consensus"]:
+                        stats_dict["sc3_consensus_turns"] += 1
+
+            total_turns = len(turns)
+            if total_turns > 0:
+                stats_dict["avg_turns"] += total_turns
+                late_game_start = round(total_turns * 0.75)
+                stats_dict["avg_late_game_switches"] += sum(turns[late_game_start:])
+        
+        except Exception as e:
+            ic(f"Error processing battle log: {e}")
+            continue
     
-    # Calculate averages if games were played
     if stats_dict["games_played"] > 0:
         stats_dict["avg_turns"] /= stats_dict["games_played"]
         stats_dict["avg_late_game_switches"] /= stats_dict["games_played"]
         stats_dict["sc3_consensus_percentage"] = stats_dict["sc3_consensus_turns"] / stats_dict["sc3_turns"] * 100 if stats_dict["sc3_turns"] > 0 else 0
-        stats_dict["win_percentage"] = stats_dict["wins"] / (stats_dict["games_played"] - stats_dict["error_matches"]) * 100
+        stats_dict["win_percentage"] = stats_dict["wins"] / (stats_dict["games_played"] - stats_dict["error_matches"]) * 100 if (stats_dict["games_played"] - stats_dict["error_matches"]) > 0 else 0
     
     return stats_dict
 
-def stats(start_date='20241030_000000', end_date='20250101_000000', model=None):
+def write_stats_to_csv(all_stats, filename="pokemon_battle_stats.csv"):
+    fieldnames = [
+        "player", "model", "game_type", "games_played", "wins", "losses", 
+        "win_percentage", "error_matches", "total_random_moves", "total_attacks",
+        "total_switches", "double_switches", "close_losses", "total_defeats",
+        "avg_turns", "avg_late_game_switches", "sc3_consensus_percentage",
+        "sc3_consensus_turns", "sc3_turns"
+    ]
+    
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for stat in all_stats:
+            writer.writerow(stat)
+
+def stats(start_date='20241030_000000', end_date='20250101_000000', model=None, player=None):
     parser = argparse.ArgumentParser(description="Get stats from Pokemon Showdown logs")
     parser.add_argument("--start", type=str, help="Start date for logs")
     parser.add_argument("--end", type=str, help="End date for logs")
     parser.add_argument("--model", type=str, help="Model to use for completion")
+    parser.add_argument("--player", type=str, help="Player to get stats for")
 
     args = parser.parse_args()
     if args.start:
@@ -104,83 +132,45 @@ def stats(start_date='20241030_000000', end_date='20250101_000000', model=None):
         end_date = args.end
     if args.model:
         model = args.model
+    if args.player:
+        player = args.player
 
-    local_stats = {
-        "games_played": 0,
-        "wins": 0,
-        "losses": 0,
-        "win_percentage": 0,
-        "error_matches": 0,
-        "total_random_moves": 0,
-        "total_attacks": 0,
-        "total_switches": 0,
-        "double_switches": 0,
-        "close_losses": 0,
-        "total_defeats": 0,
-        "avg_turns": 0,
-        "avg_late_game_switches": 0,
-        "sc3_consensus_percentage": 0,
-        "sc3_consensus_turns": 0,
-        "sc3_turns": 0
+    stats_template = {
+        "games_played": 0, "wins": 0, "losses": 0, "win_percentage": 0,
+        "error_matches": 0, "total_random_moves": 0, "total_attacks": 0,
+        "total_switches": 0, "double_switches": 0, "close_losses": 0,
+        "total_defeats": 0, "avg_turns": 0, "avg_late_game_switches": 0,
+        "sc3_consensus_percentage": 0, "sc3_consensus_turns": 0, "sc3_turns": 0
     }
 
-    ladder_stats = {
-        "games_played": 0,
-        "wins": 0,
-        "losses": 0,
-        "win_percentage": 0,
-        "error_matches": 0,
-        "total_random_moves": 0,
-        "total_attacks": 0,
-        "total_switches": 0,
-        "double_switches": 0,
-        "close_losses": 0,
-        "total_defeats": 0,
-        "avg_turns": 0,
-        "avg_late_game_switches": 0,
-        "sc3_consensus_percentage": 0,
-        "sc3_consensus_turns": 0,
-        "sc3_turns": 0
-    }
+    all_stats = []
+    players = ['LoggingPlayer', 'SC3Player', 'MemoryPlayer', 'OppositionPlayer', 'InitialStrategyPlayer']
+    models = ['gpt-4o', 'gpt-4o-mini']
+    game_types = ['local', 'ladder']
 
-    # Process each type of game separately
-    local_stats = get_stats(local_stats, "local", start_date, end_date, model=model)
-    ladder_stats = get_stats(ladder_stats, "ladder", start_date, end_date, model=model)
+    for current_player in players:
+        for current_model in models:
+            for game_type in game_types:
+                stats_dict = stats_template.copy()
+                stats_dict = get_stats(
+                    stats_dict, 
+                    game_type, 
+                    start_date, 
+                    end_date, 
+                    model=current_model, 
+                    player=current_player
+                )
+                
+                # Add metadata to stats
+                stats_dict['player'] = current_player
+                stats_dict['model'] = current_model
+                stats_dict['game_type'] = game_type
+                
+                all_stats.append(stats_dict)
 
-
-    ic("From {} to {}".format(start_date, end_date))
-    ic(local_stats)
-    ic(ladder_stats)
+    # Write all stats to CSV
+    write_stats_to_csv(all_stats)
+    ic(f"Stats have been written to pokemon_battle_stats.csv")
 
 if __name__ == "__main__":
-    # Initial Runs (Zero Shot):
-    ic("Initial Run")
-    stats(start_date='20241030_000000', end_date='2024112_000000')
-
-    ic("-----------------------------------")
-    
-    # Addition of stats for Pokemon in description (Zero Shot):
-    ic("Addition of stats for Pokemon in description")
-    stats(start_date='20241112_000000', end_date='20241119_000000')
-
-    ic("-----------------------------------")
-
-    # 3 Shot Model:
-    ic("3 Shot Model gpt-4o-mini")
-    stats(start_date='20241119_000000', end_date='20241124_140000', model='gpt-4o-mini')
-
-    ic("3 Shot Model gpt-4o")
-    stats(start_date='20241119_000000', end_date='20241124_140000', model='gpt-4o')
-
-    ic("-----------------------------------")
-
-    # SC-3 Model:
-    ic("SC-3 Model gpt-4o-mini")
-    stats(start_date='20241124_140000', end_date='20241201_000000', model='gpt-4o-mini')
-
-    ic("SC-3 Model gpt-4o")
-    stats(start_date='20241124_140000', end_date='20241125_170000', model='gpt-4o')
-
-    # Memory Model (no SC):
-    ic("Memory Model gpt-4o-mini")
-    stats(start_date='20241125_170000', end_date='20250101_000000', model='gpt-4o-mini')
+    stats()

@@ -29,4 +29,4 @@ def get_strategy(battle_state, model='gpt-4o'):
         temperature=1
     )
 
-    return response.choices[0].message['content']
+    return response.choices[0].message.content

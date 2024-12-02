@@ -37,7 +37,8 @@ class BattleLogger:
                 "llm_model": self.model_name,
                 "player_name": player_name,
                 "random_move_count": 0,
-                "total_move_count": 0
+                "total_move_count": 0,
+                "player_name": player_name
             },
             "turns": []
         }
