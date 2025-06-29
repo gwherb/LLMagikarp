@@ -58,6 +58,7 @@ pokemon-stats-viz.ipynb
 
 # Ignore pickle
 token.pickle
+*.pickle
 
 # Ignore test files
 test.py
